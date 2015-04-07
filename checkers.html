@@ -69,6 +69,9 @@
     canvas.width = width;
     canvas.height = height;
     ctx = canvas.getContext("2d");
+    background = "Image/CheckersBoard.jpg";
+    ctx.fillStyle = "green";
+    ctx.fillRect(50,50, 200, 200);
 
     document.body.appendChild("canvas");
    }
