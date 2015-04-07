@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8">
     <title>WebAppDev by zbowhay</title>
-    <!--<meta name="viewport" content="width=device-width, initial-scale=1">-->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <!-- CSS Style For This Page -->
     
@@ -23,6 +23,9 @@
   </head>
   
   <!-- Body will hold the game canvas -->
+  <canvas id="gameCanvas"></canvas>
+
+
   <body>
       <script type="text/javascript">
    
@@ -49,9 +52,7 @@
    }
 
    function init(){
-    canvas = document.createElement("canvas");
-
-    window.alert("working");
+    canvas = document.getElementById("gameCanvas");
 
     width = window.innerWidth;
     height = window.innerHeight;
