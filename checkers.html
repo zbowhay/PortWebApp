@@ -8,7 +8,7 @@
     <!-- CSS Style For This Page -->
     
     <style>
-    
+
     #gameCanvas{
       display: block;
       position:absolute;
@@ -57,6 +57,14 @@
 
    }
 
+   function insert(index, string, thisString) {
+    if (index > 0)
+    return thisString.substring(0, index) + string + thisString.substring(index, thisString.length);
+    else
+    return string + thisString;
+    };
+
+
    function init(){
 
     // Initialize Canvas
@@ -84,12 +92,48 @@
 
     background.src = 'Images/CheckerBoard.jpg';
 
+    initBoard();
 
 
    }
 
-   function initCheckerPieces(){
+   function initBoard(){
+    var boardArray = [];
+    var checkerPiece;
 
+    var boardArrayString = "";
+
+    for (var i = 0; i < 8; i++) {
+      for(var j = 0; j < 8; j++){
+        boardArray.push([i,j]);
+      }
+      //Visual representation of Checker board array in a String for dev.
+      if(i > 0){
+        boardArrayString += boardArray.toString().substring(i*(4*8),(i+1)*(4*8)) + "\n";
+      }else{
+        boardArrayString += boardArray.toString() + "\n";
+      }
+    };
+
+    // Visual representation of Checker board boardArray for development
+    for(var a = 0; a < boardArrayString.length; a = a + 4){
+      var temp = a;
+      temp += 4;
+      if(temp > boardArrayString.length){
+       break;
+      }
+      else if(a == 0){
+        boardArrayString = insert(0,"[", boardArrayString);
+        a++;
+      }
+      else{
+        boardArrayString = insert(a,"][", boardArrayString);
+        a += 2;
+      }
+    }
+
+    // For Development Purposes
+    window.alert(boardArrayString);
    }
 
    // handle selection/moving pieces
