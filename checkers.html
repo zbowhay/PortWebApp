@@ -18,18 +18,27 @@
       <a href="https://github.com/zbowhay/WebAppDev/tarball/master" class="btn">Download .tar.gz</a>
     </section>
 
+
     <section class="main-content">
       
       <h3>Checkers Game</h3>
         <p>
           This game is playable as either one-player or two-player.
+          Click the image below to begin playing.
         </p>
 
     </section>
 
     <section class="main-content">
 
-      <img src="Images/CheckersBoard.jpg"></img>
+      <img src="Images/CheckersBoard.jpg" id="GameStart"></img>
 
     </section>
 
+    <script type="text/javascript">
+      $(document).ready(function(){
+        $("#GameStart").on('click', function(){
+          window.alert("Game Started!");
+        });
+      });
+    </script>
