@@ -72,10 +72,13 @@
     background = new Image();
     background.onload = function()
     {
-     ctx.drawImage(background,0,0, width, height);
+     ctx.drawImage(background,0,0, width, width);
     };
 
     background.src = 'Images/CheckersBoard.jpg';
+
+    // set fullscreen?
+    window.fullscreen;
 
    }
 
