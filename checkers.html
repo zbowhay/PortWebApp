@@ -25,7 +25,6 @@
   <!-- Body will hold the game canvas -->
   <canvas id="gameCanvas"></canvas>
 
-
   <body>
       <script type="text/javascript">
    
@@ -70,17 +69,13 @@
     ctx = canvas.getContext("2d");
 
     // Set background of canvas
-    background = document.createElement("img");
-    background.src = "Image/CheckersBoard.jpg";
-    background.width = width;
-    background.height = height;
-    canvas.appendChild(background);
+    background = new Image();
+    background.onload = function()
+    {
+     ctx.drawImage(background,0,0, width, height);
+    };
 
-    //ctx.fillStyle = "green";
-    //ctx.fillRect(50,50, 200, 200);
-
-    // Not Needed? 
-   // document.body.appendChild("canvas");
+    background.src = 'Images/CheckersBoard.jpg';
 
    }
 
