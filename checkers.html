@@ -31,14 +31,12 @@
 
     <section class="main-content">
 
-      <a href="#" class="GameStart"><img src="Images/CheckersBoard.jpg"></img></a>
+      <img src="Images/CheckersBoard.jpg" onclick="startGame()"></img>
 
     </section>
 
     <script type="text/javascript">
-      $(document).ready(function(){
-        $(".GameStart").on('click', function(){
-          window.alert("Game Started!");
-        });
-      });
+      function startGame(){
+        document.alert("Game Started!");
+      }
     </script>
