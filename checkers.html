@@ -4,40 +4,77 @@
     <meta charset="UTF-8">
     <title>WebAppDev by zbowhay</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" type="text/css" href="stylesheets/normalize.css" media="screen">
-    <link href='http://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
-    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
-    <link rel="stylesheet" type="text/css" href="stylesheets/github-light.css" media="screen">
+
+    <!-- CSS Style For This Page -->
+    
+    <style>
+    #gameCanvas{
+      display: block;
+      position:absolute;
+      margin: auto;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      right: 0;
+    }
+    </style>
+
+    <!-- end of CSS -->
   </head>
+  
+  <!-- Body will hold the game canvas -->
   <body>
-    <section class="page-header">
-      <h1 class="project-name">WebAppDev</h1>
-      <h2 class="project-tagline">Simple website that will host a web app for a student project in web app development</h2>
-      <a href="https://github.com/zbowhay/WebAppDev" class="btn">View on GitHub</a>
-      <a href="https://github.com/zbowhay/WebAppDev/zipball/master" class="btn">Download .zip</a>
-      <a href="https://github.com/zbowhay/WebAppDev/tarball/master" class="btn">Download .tar.gz</a>
-    </section>
 
 
-    <section class="main-content">
-      
-      <h3>Checkers Game</h3>
-        <p>
-          This game is playable as either one-player or two-player.
-          Click the button below to begin playing.
-        </p>
-        <button onclick="startGame()">Start Game</button>
-        <br />
-        <div id="game"></div>
-
-    </section>
-      
-      <!-- <a href="#" onclick="startGame()"><img src="Images/CheckersBoard.jpg"></img></a>
-      -->
+  </body>
 
     <script type="text/javascript">
-      function startGame(){
-        //window.alert("Game Started!");
-        document.getElementById("game").innerHTML = "<canvas id='gameCanvas' style='border: 1px solid #000'></canvas>";
+     
+     var
+
+     canvas,
+     ctx,
+     width,
+     height,
+
+     currentState,
+     states = {
+        Splash: 0, Game: 1, End: 2
+     },
+
+     background,
+     whiteChips,
+     blackChips,
+     Score;
+
+     function main(){
+      init();
+
+     }
+
+     function init(){
+      canvas = document.createElement("canvas");
+
+      width = window.innerWidth;
+      height = window.innerHeight;
+
+      if(width >=750){
+        width = 750;
+        height = 750;
       }
+
+      canvas.style.border = "1px solid #000";
+      canvas.width = width;
+      canvas.height = height;
+      ctx = canvas.getContext("2d");
+
+      document.body.appendChild("canvas");
+     }
+
+     function startGame(){
+
+     }
+
+     main();
+
     </script>
