@@ -28,53 +28,54 @@
 
   </body>
 
-    <script type="text/javascript">
-     
-     var
+  <script type="text/javascript">
+   
+   var
 
-     canvas,
-     ctx,
-     width,
-     height,
+   canvas,
+   ctx,
+   width,
+   height,
 
-     currentState,
-     states = {
-        Splash: 0, Game: 1, End: 2
-     },
+   currentState,
+   states = {
+      Splash: 0, Game: 1, End: 2
+   },
 
-     background,
-     whiteChips,
-     blackChips,
-     Score;
+   background,
+   whiteChips,
+   blackChips,
+   Score;
 
-     function main(){
-      init();
+   function main(){
+    init();
 
-     }
+   }
 
-     function init(){
-      canvas = document.createElement("canvas");
+   function init(){
+    canvas = document.createElement("canvas");
 
-      width = window.innerWidth;
-      height = window.innerHeight;
+    width = window.innerWidth;
+    height = window.innerHeight;
 
-      if(width >=750){
-        width = 750;
-        height = 750;
-      }
+    if(width >=750){
+      width = 750;
+      height = 750;
+    }
 
-      canvas.style.border = "1px solid #000";
-      canvas.width = width;
-      canvas.height = height;
-      ctx = canvas.getContext("2d");
+    canvas.style.border = "1px solid #000";
+    canvas.width = width;
+    canvas.height = height;
+    ctx = canvas.getContext("2d");
 
-      document.body.appendChild("canvas");
-     }
+    document.body.appendChild("canvas");
+   }
 
-     function startGame(){
+   function startGame(){
 
-     }
+   }
 
-     main();
+   main();
 
-    </script>
+  </script>
+</html>
