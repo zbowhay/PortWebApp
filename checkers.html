@@ -26,22 +26,18 @@
           This game is playable as either one-player or two-player.
           Click the button below to begin playing.
         </p>
+        <button onclick="startGame()">Start Game</button>
+        <br />
+        <div id="game"></div>
 
     </section>
-
-    <section class="main-content">
-
-      <button onclick="startGame()">Start Game</button>
       
       <!-- <a href="#" onclick="startGame()"><img src="Images/CheckersBoard.jpg"></img></a>
       -->
-      <span id="game"></span>
-
-    </section>
 
     <script type="text/javascript">
       function startGame(){
-        window.alert("Game Started!");
+        //window.alert("Game Started!");
         document.getElementById("game").innerHTML = "<canvas id='gameCanvas' width = device-width style='border: 1px solid #000'></canvas>";
       }
     </script>
