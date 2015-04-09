@@ -33,121 +33,181 @@
   <canvas id="gameCanvas"></canvas>
 
   <body>
-      <script type="text/javascript">
-   
-   var
+    <script type="text/javascript">
 
-   canvas,
-   ctx,
-   width,
-   height,
+     var
 
-   currentState,
-   states = {
-      Splash: 0, Game: 1, End: 2
-   },
+     canvas,
+     ctx,
+     width,
+     height,
 
-   background,
-   whiteChips,
-   blackChips,
-   Score;
+     currentState,
+     states = {
+        Splash: 0, Game: 1, End: 2
+     },
 
-   function main(){
-    init();
+     background,
+     redChips,
+     blackChips,
+     Score;
 
-   }
+     function main(){
+      init();
 
-   function insert(index, string, thisString) {
-    if (index > 0)
-    return thisString.substring(0, index) + string + thisString.substring(index, thisString.length);
-    else
-    return string + thisString;
-    };
+     }
 
-
-   function init(){
-
-    // Initialize Canvas
-    canvas = document.getElementById("gameCanvas");
-
-    width = window.innerWidth;
-    height = window.innerHeight;
-
-    if(width >=750){
-      width = 750;
-      height = width;
-    }
-
-    canvas.style.border = "1px solid #000";
-    canvas.width = width;
-    canvas.height = height;
-    ctx = canvas.getContext("2d");
-
-    // Set background of canvas
-    background = new Image();
-    background.onload = function()
-    {
-     ctx.drawImage(background,0,0, width, height);
-    };
-
-    background.src = 'Images/CheckerBoard.jpg';
-
-    initBoard();
+     function insert(index, string, thisString) {
+      if (index > 0)
+      return thisString.substring(0, index) + string + thisString.substring(index, thisString.length);
+      else
+      return string + thisString;
+      };
 
 
-   }
+     function init(){
 
-   function initBoard(){
-    var boardArray = [];
-    var checkerPiece;
+      // Initialize Canvas
+      canvas = document.getElementById("gameCanvas");
 
-    var boardArrayString = "";
+      width = window.innerWidth;
+      height = window.innerHeight;
 
-    for (var i = 0; i < 8; i++) {
-      for(var j = 0; j < 8; j++){
-        boardArray.push([i,j]);
+      if(width >=750){
+        width = 750;
+        height = width;
       }
-      //Visual representation of Checker board array in a String for dev.
-      if(i > 0){
-        boardArrayString += boardArray.toString().substring(i*(4*8),(i+1)*(4*8)) + "\n";
-      }else{
-        boardArrayString += boardArray.toString() + "\n";
-      }
-    };
 
-    // Visual representation of Checker board boardArray for development
-    for(var a = 0; a < boardArrayString.length; a = a + 4){
-      var temp = a;
-      temp += 4;
-      if(temp > boardArrayString.length){
-       break;
-      }
-      else if(a == 0){
-        boardArrayString = insert(0,"[", boardArrayString);
-        a++;
-      }
-      else{
-        boardArrayString = insert(a,"][", boardArrayString);
-        a += 2;
-      }
-    }
+      canvas.style.border = "1px solid #000";
+      canvas.width = width;
+      canvas.height = height;
+      ctx = canvas.getContext("2d");
 
-    // For Development Purposes
-    window.alert(boardArrayString);
-   }
+      // Set background of canvas and place chips in correct locations
+      background = new Image();
+      redChips = new Image();
+      blackChips = new Image();
+      background.onload = function()
+      {
+        ctx.drawImage(background,0,0, width, height);
+        var loopCount = 0;
+        var placementCount = 0;
+        var everyOther;
+        for(var j = 0; j < height; j += (height/8)){
+          window.alert(loopCount + ", " + j);
+          loopCount++;
+
+          for(var i = 0; i < width; i += (width/8)){
+            
+            placementCount++;
+            if(loopCount <= 3) // for Black chips
+            {
+              if(loopCount == 1 || loopCount == 3)
+              {
+                if(placementCount == 1 || placementCount == 3 || placementCount == 5|| placementCount == 7) // draw chips in correct places for row 1 & 3
+                {
+                  ctx.drawImage(blackChips, i, j, (width/8), (height/8));
+                }
+              }
+              else // loopCount == 2
+              {
+                if(placementCount == 2 || placementCount == 4 || placementCount == 6 || placementCount == 8) // draw chips in correct places fr row 2
+                {
+                  ctx.drawImage(blackChips, i, j, (width/8), (height/8));
+                }
+              }
+            
+            }
+            else // for Red chips
+            {
+              if(loopCount == 6 || loopCount == 8)
+              {
+                if(placementCount == 2 || placementCount == 4 || placementCount == 6 || placementCount == 8)// draw chips in correct places for row 6 & 8
+                {
+                  ctx.drawImage(redChips, i, j, (width/8), (height/8));
+                }
+              }
+                else // loopCount == 7
+                {
+                  if(placementCount == 1 || placementCount == 3 || placementCount == 5 || placementCount == 7)// draw chips in correct places for row 7
+                  {
+                    ctx.drawImage(redChips, i, j, (width/8), (height/8));
+                  }
+                }
+              //ctx.drawImage(redChips, i, j, (width/8), (height/8));
+            }
+          }
+
+          if(loopCount == 3) // skip middle two rows
+          {
+            j += 2*(height/8);
+            loopCount++; // skipped two loopCounts so they need to be added here.
+            loopCount++;
+          }
+          placementCount = 0;
+        }
+      };
+
+      background.src = 'Images/CheckerBoard.jpg';
+      blackChips.src = 'Images/BlackChecker.png';
+      redChips.src = 'Images/RedChecker.png';
+
+      // boardArray
+      initBoardArray();
+
+
+     }
+
+     function initBoardArray(){
+      var boardArray = [];
+      var checkerPiece;
+
+      var boardArrayString = "";
+
+      for (var i = 0; i < 8; i++) {
+        for(var j = 0; j < 8; j++){
+          boardArray.push([i,j]);
+        }
+        //Visual representation of Checker board array in a String for dev.
+        if(i > 0){
+          boardArrayString += boardArray.toString().substring(i*(4*8),(i+1)*(4*8)) + "\n";
+        }else{
+          boardArrayString += boardArray.toString() + "\n";
+        }
+      };
+
+      // Visual representation of Checker board boardArray for development
+      for(var a = 0; a < boardArrayString.length; a = a + 4){
+        var temp = a;
+        temp += 4;
+        if(temp > boardArrayString.length){
+         break;
+        }
+        else if(a == 0){
+          boardArrayString = insert(0,"[", boardArrayString);
+          a++;
+        }
+        else{
+          boardArrayString = insert(a,"][", boardArrayString);
+          a += 2;
+        }
+      }
+
+      // For Development Purposes
+      window.alert(boardArrayString);
+     }
 
    // handle selection/moving pieces
    /* click once to select piece, click again to place.
       use click.x and click.y to get point and then find which array item is being selected. and move it. either move piece or toggle css rule to show or not show piece (have one at every location). 
     */
 
-   function startGame(){
+     function startGame(){
 
-   }
+     }
 
-   main();
+     main();
 
-  </script>
-
+    </script>
   </body>
 </html>
