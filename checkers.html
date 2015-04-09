@@ -69,6 +69,8 @@
 
       // Initialize Canvas
       canvas = document.getElementById("gameCanvas");
+      canvas.addEventListener("touchstart", touchDown, false);
+      canvas.addEventListener("mousedown", mouseDown, false);
 
       width = window.innerWidth;
       height = window.innerHeight;
@@ -94,7 +96,7 @@
         var placementCount = 0;
         var everyOther;
         for(var j = 0; j < height; j += (height/8)){
-          window.alert(loopCount + ", " + j);
+          //window.alert(loopCount + ", " + j); // DEBUG Purposes
           loopCount++;
 
           for(var i = 0; i < width; i += (width/8)){
@@ -204,6 +206,21 @@
 
      function startGame(){
 
+     }
+
+     // EVENT CONTROLLERS
+
+     function touchDown(){
+      event.preventDefault();
+      canvas_x = event.targetTouches[0].pageX;
+      canvas_y = event.targetTouches[0].pageY;
+      window.alert("X = " + canvas_x + ", Y = " + canvas_y);
+     }
+
+     function mouseDown(){
+      canvas_x = event.pageX;
+      canvas_y = event.pageY;
+      window.alert("X = " + canvas_x + ", Y = " + canvas_y);
      }
 
      main();
