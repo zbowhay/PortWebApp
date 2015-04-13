@@ -34,9 +34,6 @@
     <canvas id="gameCanvas"></canvas>
     
     <script type="text/javascript">
-
-    window.onload = function(){
-      window.alert("page loaded");
     
     // Variables...
      var
@@ -170,22 +167,24 @@
       canvas.height = height;
       ctx = canvas.getContext("2d");
 
-      // Set background of canvas and place chips in correct locations
       // Init checkerPiece game objects array
       initCheckerPieceArray();
 
-      //Draw Canvas of Game Starting
+      //Draw the starting layout of game to canvas
 
       background = new Image();
-      background.src = 'Images/CheckerBoard.jpg';
-      redChips = checkerPieceArray[12].image;// 12 contains img of Red Chip
-      blackChips = checkerPieceArray[0].image;// 0 contains img of Black Chip
-      
+      // 12 - 23 = img of Red Chip
+      redChips = checkerPieceArray[12].image;
+      // 0 - 11 = img of Black Chip
+      blackChips = checkerPieceArray[0].image;
 
-      window.alert("BEFORE ONLOAD");
+      background.src = 'Images/CheckerBoard.jpg';
+      redChips.src = checkerPieceArray[12].imageSource;
+      blackChips.src = checkerPieceArray[0].imageSource;
+
+      // Wait for background/other images to load before drawing to canvas
       background.onload = function()
       {
-        window.alert("AFTER ONLOAD");
         // draw background
         ctx.drawImage(background,0,0, width, height);
 
@@ -199,12 +198,15 @@
         var everyOther;
 
         for(var j = 0; j < height; j += (height/8)){
-          //window.alert(loopCount + ", " + j); // DEBUG Purposes
+
+          // used to track which rows to draw the chips on.
           loopCount++;
+           // probably not a necessary variable
 
           for(var i = 0; i < width; i += (width/8)){
             
             placementCount++;
+            // used to skip spots on the board that shouldn't have a chip placed
 
             // FOR BLACK CHIPS
             if(loopCount <= 3)
@@ -223,21 +225,14 @@
                   // board location coordinates for each checker piece
                   checkerPieceArray[pieceNumber].setBoardX(returnBoardX(i));
                   checkerPieceArray[pieceNumber].setBoardY(returnBoardY(j));
-
-                  // debugging purposes
-                  // if needed again uncomment and post at the end of the next 3 else/if portions as well...
                   
-                  window.alert("checkerPieceArray Debug: \n"
-                   + "checkerPieceArray[" + pieceNumber + "] X = " + checkerPieceArray[pieceNumber].boardX + "\n"
-                   + "checkerPieceArray[" + pieceNumber + "] Y = " + checkerPieceArray[pieceNumber].boardY);
-                  
-                  // add one to pieceNumber to help keep track of which location/images are being assigned to checkerPieceArray.
+                  // add one to pieceNumber to help keep track of which location/images are being assigned to checkerPieceArray[].
                   pieceNumber++;
                 }
               }
               else // loopCount == 2
               {
-                if(placementCount == 2 || placementCount == 4 || placementCount == 6 || placementCount == 8) // draw chips in correct places fr row 2
+                if(placementCount == 2 || placementCount == 4 || placementCount == 6 || placementCount == 8) // draw chips in correct places for row 2
                 {
                   // draw checker piece to screen
                   ctx.drawImage(blackChips, i, j, (width/8), (height/8));
@@ -311,13 +306,8 @@
         main();
       };
 
-      // image sources defined after onload().  only way this would work...
-      //background.src = 'Images/CheckerBoard.jpg';
-      blackChips.src = 'Images/BlackChecker.png';
-      redChips.src = 'Images/RedChecker.png';
-
-      // boardArray
-      initBoardArray();
+      // not necessary for functionality
+      // initBoardArray();
      }
 
 
@@ -346,6 +336,7 @@
 
 
      //INITBOARDARRAY FUNCTION
+     // not a necessary function
      function initBoardArray(){
       var boardArray = [];
 
@@ -449,6 +440,12 @@
       return null;
      }
 
+     function checkerPieceArrayDebug(pieceNumber){
+      window.alert("checkerPieceArray Debug: \n"
+       + "checkerPieceArray[" + pieceNumber + "] X = " + checkerPieceArray[pieceNumber].boardX + "\n"
+       + "checkerPieceArray[" + pieceNumber + "] Y = " + checkerPieceArray[pieceNumber].boardY);
+     }
+
     // EVENT CONTROLLERS
 
      function touchDown(){
@@ -471,7 +468,7 @@
      function cleanUpInit(){
 
      }
-   }
+     
     </script>
   </body>
 </html>
