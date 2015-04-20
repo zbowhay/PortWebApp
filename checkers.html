@@ -41,13 +41,16 @@
      width,
      height,
 
-     currentState,
      readyState = false,
 
      background,
      redChips,
      blackChips,
-     checkerPieceArray;
+     redChipsSelected,
+     blackChipsSelected,
+     checkerPieceArray,
+
+     redTurn = true;
 
      // RUN THE PROGRAM!
 
@@ -65,7 +68,6 @@
       }
       else // readyState == true // Begin gameplay
       {
-        //checkerPieceArray[2].printAttributeInfo(2);
         window.alert("red goes first!");
       }
      }
@@ -172,14 +174,16 @@
       //Draw the starting layout of game to canvas
 
       background = new Image();
-      // 12 - 23 = img of Red Chip
       redChips = checkerPieceArray[12].image;
-      // 0 - 11 = img of Black Chip
       blackChips = checkerPieceArray[0].image;
+      redChipsSelected = new Image();
+      blackChipsSelected = new Image();
 
       background.src = 'Images/CheckerBoard.jpg';
       redChips.src = checkerPieceArray[12].imageSource;
       blackChips.src = checkerPieceArray[0].imageSource;
+      redChipsSelected.src = 'Images/RedCheckerSelected.png';
+      blackChipsSelected.src = 'Images/BlackCheckerSelected.png';
 
       // Wait for background/other images to load before drawing to canvas
       background.onload = function()
@@ -458,7 +462,9 @@
       canvas_y -= canvas.offsetTop;
       //window.alert("X = " + canvas_x + ", Y = " + canvas_y);
 
-      checkerPieceSelected(canvas_x, canvas_y);
+      if(checkerPieceSelected(canvas_x, canvas_y) == true){
+        redraw();
+      }
      }
 
      function mouseDown(){
@@ -469,7 +475,9 @@
       canvas_y -= canvas.offsetTop;
 
       //window.alert("X = " + canvas_x + ", Y = " + canvas_y);
-      checkerPieceSelected(canvas_x, canvas_y);
+      if(checkerPieceSelected(canvas_x, canvas_y) == true){
+        redraw();
+      }
      }
 
      function mouseDownOnPiece(){
@@ -484,7 +492,27 @@
       // represents an individual box area on the board
       var box;
       // load box[] with coordinates that belong to each checker piece
-      for(i = 0; i < checkerPieceArray.length; i++){
+      if(redTurn == true){
+        for(i = 12; i < checkerPieceArray.length; i++){
+          var x1, x2, y1, y2;
+          x1 = checkerPieceArray[i].x;
+          x2 = x1 + (width/8);
+          y1 = checkerPieceArray[i].y;
+          y2 = y1 + (height/8);
+          box = [x1, x2, y1, y2];
+          // check if click was within the box area around checker piece
+          if(x >= box[0] && x <= box[1]){
+            if(y >= box[2] && y <= box[3]){
+              //update image source of chip clicked on with "selected" image of itself
+              selectedImage(i);
+              return true;
+            }
+          }
+        }
+      }
+      else // redTurn == false
+      {
+        for(i = 0; i < checkerPieceArray.length/2; i++){
         var x1, x2, y1, y2;
         x1 = checkerPieceArray[i].x;
         x2 = x1 + (width/8);
@@ -494,14 +522,37 @@
         // check if click was within the box area around checker piece
         if(x >= box[0] && x <= box[1]){
           if(y >= box[2] && y <= box[3]){
-            checkerPieceArray[i].printAttributeInfo(i);
+            //update image source of chip clicked on with "selected" image of itself
+            selectedImage(i);
             return true;
           }
         }
       }
+      }
+      
       return false;
      }
 
+     function redraw(){
+      ctx.drawImage(background, 0, 0, width, height);
+      for(i = 0; i < checkerPieceArray.length; i++){
+        ctx.drawImage(checkerPieceArray[i].image, checkerPieceArray[i].x, checkerPieceArray[i].y, (width/8),(height/8));
+      }
+     }
+
+     // simply used to change image source of a checkerpiece to its selected couterpart and then refresh that checker piece's image object
+     function selectedImage(i){
+      // blackCheckerSelected
+      if(i < 12){
+        checkerPieceArray[i].imageSource = "Images/BlackCheckerSelected.png";
+        checkerPieceArray[i].createImage();
+      }
+      else // redCheckerSelected
+      {
+        checkerPieceArray[i].imageSource = "Images/RedCheckerSelected.png";
+        checkerPieceArray[i].createImage();
+      }
+     }
     </script>
   </body>
 </html>
