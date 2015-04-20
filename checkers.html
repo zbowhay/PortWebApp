@@ -63,9 +63,10 @@
       {
         init();
       }
-      else // readyState == true
+      else // readyState == true // Begin gameplay
       {
-        checkerPieceArray[12].printAttributeInfo(12);
+        //checkerPieceArray[2].printAttributeInfo(2);
+        window.alert("red goes first!");
       }
      }
 
@@ -122,13 +123,13 @@
 
       this.printAttributeInfo = function(arrayPosition){
         window.alert('Information about checkerPieceArray[' + arrayPosition + '] object: \n' + 
-        'Team: ' + checkerPieceArray[12].team + '\n' +
-        'Name: ' + checkerPieceArray[12].name + '\n' +
-        'ImageSource: ' + checkerPieceArray[12].imageSource + '\n' +
-        'X: ' + checkerPieceArray[12].x + '\n' +
-        'Y: ' + checkerPieceArray[12].y + '\n' +
-        'BoardX: ' + checkerPieceArray[12].boardX + '\n' +
-        'BoardY: ' + checkerPieceArray[12].boardY);
+        'Team: ' + checkerPieceArray[arrayPosition].team + '\n' +
+        'Name: ' + checkerPieceArray[arrayPosition].name + '\n' +
+        'ImageSource: ' + checkerPieceArray[arrayPosition].imageSource + '\n' +
+        'X: ' + checkerPieceArray[arrayPosition].x + '\n' +
+        'Y: ' + checkerPieceArray[arrayPosition].y + '\n' +
+        'BoardX: ' + checkerPieceArray[arrayPosition].boardX + '\n' +
+        'BoardY: ' + checkerPieceArray[arrayPosition].boardY);
       };
      }
 
@@ -151,7 +152,7 @@
       canvas = document.getElementById("gameCanvas");
       canvas.addEventListener("touchstart", touchDown, false);
       canvas.addEventListener("mousedown", mouseDown, false);
-
+      
       width = window.innerWidth;
       height = window.innerHeight;
 
@@ -454,9 +455,14 @@
      }
 
      function mouseDown(){
-      canvas_x = event.pageX;
-      canvas_y = event.pageY;
-      window.alert("X = " + canvas_x + ", Y = " + canvas_y);
+      canvas_x = event.x;
+      canvas_y = event.y;
+
+      canvas_x -= canvas.offsetLeft;
+      canvas_y -= canvas.offsetTop;
+
+      //window.alert("X = " + canvas_x + ", Y = " + canvas_y);
+      checkerPieceSelected(canvas_x, canvas_y);
      }
 
      function mouseDownOnPiece(){
@@ -465,6 +471,28 @@
 
      function cleanUpInit(){
 
+     }
+
+     function checkerPieceSelected(x, y){
+      // represents an individual box area on the board
+      var box;
+      // load box[] with coordinates that belong to each checker piece
+      for(i = 0; i < checkerPieceArray.length; i++){
+        var x1, x2, y1, y2;
+        x1 = checkerPieceArray[i].x;
+        x2 = x1 + (width/8);
+        y1 = checkerPieceArray[i].y;
+        y2 = y1 + (height/8);
+        box = [x1, x2, y1, y2];
+        // check if click was within the box area around checker piece
+        if(x >= box[0] && x <= box[1]){
+          if(y >= box[2] && y <= box[3]){
+            checkerPieceArray[i].printAttributeInfo(i);
+            return true;
+          }
+        }
+      }
+      return false;
      }
 
     </script>

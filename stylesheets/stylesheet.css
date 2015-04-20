@@ -1,14 +1,6 @@
 * {
   box-sizing: border-box; }
 
-/* My Changes */
-
-#gameCanvas {
-  width: 100%;
-  height: 100%;
-  margin: 5px;
-}
-
 
 /* Default Settings */
 body {
