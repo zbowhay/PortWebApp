@@ -42,13 +42,16 @@
      height,
 
      readyState = false,
+     pieceSelected = [false, 0],
+     checkerPieceArray,
 
+     //Image vars
      background,
      redChips,
      blackChips,
      redChipsSelected,
      blackChipsSelected,
-     checkerPieceArray,
+     aSquare,
 
      redTurn = true;
 
@@ -69,6 +72,7 @@
       else // readyState == true // Begin gameplay
       {
         window.alert("red goes first!");
+        //checkerPieceArray[9].availableMoves(9);
       }
      }
 
@@ -133,6 +137,42 @@
         'BoardX: ' + checkerPieceArray[arrayPosition].boardX + '\n' +
         'BoardY: ' + checkerPieceArray[arrayPosition].boardY);
       };
+
+      // check for available moves around checkerPiece
+      this.availableMoves = function(n){
+        var aMoves = [true, true, true, true];
+
+        // gather up potential moves
+        var pMoves = [[checkerPieceArray[n].boardX - 1, checkerPieceArray[n].boardY - 1],// top left
+        [checkerPieceArray[n].boardX + 1, checkerPieceArray[n].boardY - 1],// top right
+        [checkerPieceArray[n].boardX - 1, checkerPieceArray[n].boardY + 1],// bottom left
+        [checkerPieceArray[n].boardX + 1, checkerPieceArray[n].boardY + 1]];// bottom right
+        
+        // Evalute potential moves
+        // check to see if move is off board
+        for(u = 0; u < pMoves.length; u++){
+          if(pMoves[u][0] < 0 || pMoves[u][0] > 7 || pMoves[u][1] < 0 || pMoves[u][1] > 7){
+            aMoves[u] = false;
+          }
+        }
+
+        
+        // check to see if other chips are already placed around this chip
+        for(i = 0; i < checkerPieceArray.length; i++){
+          for(j = 0; j < pMoves.length; j++){
+            if(pMoves[j][0] == checkerPieceArray[i].boardX && pMoves[j][1] == checkerPieceArray[i].boardY){
+              // this means that there is a checker piece already located in an adjacent location to the selected chip and therefore it cannot be moved to that location
+              aMoves[j] = false;
+            }
+          }
+        }
+        // debug to show the effects of evaluating 
+        /*for(k = 0; k < aMoves.length; k++){
+          window.alert(aMoves[k]);
+        }*/
+
+        return [aMoves, pMoves];
+      };
      }
 
      // FUNCTIONS
@@ -178,12 +218,15 @@
       blackChips = checkerPieceArray[0].image;
       redChipsSelected = new Image();
       blackChipsSelected = new Image();
+      aSquare = new Image();
+
 
       background.src = 'Images/CheckerBoard.jpg';
       redChips.src = checkerPieceArray[12].imageSource;
       blackChips.src = checkerPieceArray[0].imageSource;
       redChipsSelected.src = 'Images/RedCheckerSelected.png';
       blackChipsSelected.src = 'Images/BlackCheckerSelected.png';
+      aSquare.src = 'Images/availableSquare.png';
 
       // Wait for background/other images to load before drawing to canvas
       background.onload = function()
@@ -475,8 +518,18 @@
       canvas_y -= canvas.offsetTop;
 
       //window.alert("X = " + canvas_x + ", Y = " + canvas_y);
-      if(checkerPieceSelected(canvas_x, canvas_y) == true){
-        redraw();
+      //make sure no other pieces are already selected
+      if(pieceSelected[0] == false){
+        //detect if click landed on a checker piece
+        if(checkerPieceSelected(canvas_x, canvas_y) == true){
+          pieceSelected[0] = true;
+          redraw();
+          drawAvailableMoves(pieceSelected[1]);
+        }
+      }
+      else // checker piece already selected
+      {
+        // do something
       }
      }
 
@@ -505,6 +558,7 @@
             if(y >= box[2] && y <= box[3]){
               //update image source of chip clicked on with "selected" image of itself
               selectedImage(i);
+              pieceSelected[1] = i;
               return true;
             }
           }
@@ -524,6 +578,7 @@
           if(y >= box[2] && y <= box[3]){
             //update image source of chip clicked on with "selected" image of itself
             selectedImage(i);
+            pieceSelected[1] = i;
             return true;
           }
         }
@@ -534,9 +589,24 @@
      }
 
      function redraw(){
+      // draw background over old board
       ctx.drawImage(background, 0, 0, width, height);
+      // redraw all checker pieces
       for(i = 0; i < checkerPieceArray.length; i++){
         ctx.drawImage(checkerPieceArray[i].image, checkerPieceArray[i].x, checkerPieceArray[i].y, (width/8),(height/8));
+      }
+     }
+
+     function drawAvailableMoves(i){
+      // draw availableSquare.png around selected checker piece
+      var moves = checkerPieceArray[i].availableMoves(i);
+      var aMoves = moves[0];
+      var pMoves = moves[1];
+      for(i = 0; i < aMoves.length; i++){
+        // if move is available then draw aSquare to that location on the canvas
+        if(aMoves[i] == true){
+          ctx.drawImage(aSquare, pMoves[i][0] * (width/8), pMoves[i][1] * (height/8), (width/8), (height/8));
+        }
       }
      }
 
@@ -553,6 +623,7 @@
         checkerPieceArray[i].createImage();
       }
      }
+
     </script>
   </body>
 </html>
