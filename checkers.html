@@ -186,12 +186,11 @@
       return thisString.substring(0, index) + string + thisString.substring(index, thisString.length);
       else
       return string + thisString;
-      };
+     };
 
 
       // MAIN INIT FUNCTION
      function init(){
-
       // Initialize Canvas
       canvas = document.getElementById("gameCanvas");
       canvas.addEventListener("touchstart", touchDown, false);
@@ -676,6 +675,7 @@
       }
      }
 
+     // simply used to change image source of a checkerpiece back to its unselected image source.
      function unselectedImage(i){
       // blackCheckerSelected
       if(i < 12){
