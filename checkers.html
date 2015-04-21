@@ -42,7 +42,7 @@
      height,
 
      readyState = false,
-     pieceSelected = [false, 0],
+     pieceSelected = [false, null],
      checkerPieceArray,
 
      //Image vars
@@ -72,7 +72,8 @@
       else // readyState == true // Begin gameplay
       {
         window.alert("red goes first!");
-        redraw();
+        // refresh the canvas three times after initial load to avoid any images not showing up on canvas
+        redraw(); redraw(); redraw();
         //checkerPieceArray[9].availableMoves(9);
       }
      }
@@ -504,20 +505,23 @@
 
       canvas_x -= canvas.offsetLeft;
       canvas_y -= canvas.offsetTop;
-      //window.alert("X = " + canvas_x + ", Y = " + canvas_y);
 
+      //window.alert("X = " + canvas_x + ", Y = " + canvas_y);
       //make sure no other pieces are already selected
       if(pieceSelected[0] == false){
         //detect if click landed on a checker piece
         if(checkerPieceSelected(canvas_x, canvas_y) == true){
-          pieceSelected[0] = true;
+          //pieceSelected[0] = true;
           redraw();
           drawAvailableMoves(pieceSelected[1]);
+
         }
       }
-      else // checker piece already selected
+      else if(pieceSelected[0] == true)
       {
-        // do something
+        if(checkerPieceSelected(canvas_x,canvas_y) == true){
+          redraw();
+        }
       }
      }
 
@@ -533,23 +537,22 @@
       if(pieceSelected[0] == false){
         //detect if click landed on a checker piece
         if(checkerPieceSelected(canvas_x, canvas_y) == true){
-          pieceSelected[0] = true;
+          //pieceSelected[0] = true;
           redraw();
           drawAvailableMoves(pieceSelected[1]);
+
         }
       }
-      else // checker piece already selected
+      else if(pieceSelected[0] == true)
       {
-        // do something
+        if(checkerPieceSelected(canvas_x,canvas_y) == true){
+          redraw();
+        }
       }
      }
 
 
      // game mechanic functions
-
-     function cleanUpInit(){
-
-     }
 
      function checkerPieceSelected(x, y){
       // represents an individual box area on the board
@@ -566,9 +569,28 @@
           // check if click was within the box area around checker piece
           if(x >= box[0] && x <= box[1]){
             if(y >= box[2] && y <= box[3]){
-              //update image source of chip clicked on with "selected" image of itself
-              selectedImage(i);
-              pieceSelected[1] = i;
+              // if checker piece is already selected, deselect it
+              if(pieceSelected[1] == i){
+                unselectedImage(i);
+                pieceSelected[1] = null;
+                pieceSelected[0] = false;
+              }
+              else // if checker piece has not been selected yet, select it
+              {
+                //update image source of chip clicked on with "selected" image of itself
+                if(pieceSelected[1] == null){
+                  selectedImage(i);
+                  pieceSelected[1] = i;
+                  pieceSelected[0] = true;
+                }else{
+                  // a piece is selected and the user just clicked on a different piece.
+                  // this stops the game from calling redraw(); when not deselecting his own piece.
+
+
+                  //later this will include actions to be taken when moving to an available space.
+                  return false;
+                }
+              }
               return true;
             }
           }
@@ -586,14 +608,34 @@
         // check if click was within the box area around checker piece
         if(x >= box[0] && x <= box[1]){
           if(y >= box[2] && y <= box[3]){
-            //update image source of chip clicked on with "selected" image of itself
-            selectedImage(i);
-            pieceSelected[1] = i;
+            // if checker piece is already selected, deselect it
+                          // if checker piece is already selected, deselect it
+              if(pieceSelected[1] == i){
+                unselectedImage(i);
+                pieceSelected[1] = null;
+                pieceSelected[0] = false;
+              }
+              else // if checker piece has not been selected yet, select it
+              {
+                //update image source of chip clicked on with "selected" image of itself
+                if(pieceSelected[1] == null){
+                  selectedImage(i);
+                  pieceSelected[1] = i;
+                  pieceSelected[0] = true;
+                }else{
+                  // a piece is selected and the user just clicked on a different piece.
+                  // this stops the game from calling redraw(); when not deselecting his own piece.
+
+
+                  //later this will include actions to be taken when moving to an available space.
+                  return false;
+                }
+              }
             return true;
           }
         }
       }
-      }
+     }
       
       return false;
      }
@@ -630,6 +672,19 @@
       else // redCheckerSelected
       {
         checkerPieceArray[i].imageSource = "Images/RedCheckerSelected.png";
+        checkerPieceArray[i].createImage();
+      }
+     }
+
+     function unselectedImage(i){
+      // blackCheckerSelected
+      if(i < 12){
+        checkerPieceArray[i].imageSource = "Images/BlackChecker.png";
+        checkerPieceArray[i].createImage();
+      }
+      else // redCheckerSelected
+      {
+        checkerPieceArray[i].imageSource = "Images/RedChecker.png";
         checkerPieceArray[i].createImage();
       }
      }
