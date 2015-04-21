@@ -505,8 +505,18 @@
       canvas_y -= canvas.offsetTop;
       //window.alert("X = " + canvas_x + ", Y = " + canvas_y);
 
-      if(checkerPieceSelected(canvas_x, canvas_y) == true){
-        redraw();
+      //make sure no other pieces are already selected
+      if(pieceSelected[0] == false){
+        //detect if click landed on a checker piece
+        if(checkerPieceSelected(canvas_x, canvas_y) == true){
+          pieceSelected[0] = true;
+          redraw();
+          drawAvailableMoves(pieceSelected[1]);
+        }
+      }
+      else // checker piece already selected
+      {
+        // do something
       }
      }
 
