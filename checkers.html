@@ -380,6 +380,10 @@
         }
       } 
      }
+      // May or may not need.. could clean up mouseDown eventListener
+      function updateCheckerPieceArray(){
+
+      }
 
 
      //INITBOARDARRAY FUNCTION
@@ -505,7 +509,6 @@
       canvas_x -= canvas.offsetLeft;
       canvas_y -= canvas.offsetTop;
 
-      //window.alert("X = " + canvas_x + ", Y = " + canvas_y);
       //make sure no other pieces are already selected
       if(pieceSelected[0] == false){
         //detect if click landed on a checker piece
@@ -516,8 +519,11 @@
 
         }
       }
+      // checker piece has already been selected
       else if(pieceSelected[0] == true)
       {
+
+        //will run through the checkerPieceSelected function and not allow any other checker pieces to be clicked while the current chip is still selected.
         if(checkerPieceSelected(canvas_x,canvas_y) == true){
           redraw();
         }
@@ -531,7 +537,6 @@
       canvas_x -= canvas.offsetLeft;
       canvas_y -= canvas.offsetTop;
 
-      //window.alert("X = " + canvas_x + ", Y = " + canvas_y);
       //make sure no other pieces are already selected
       if(pieceSelected[0] == false){
         //detect if click landed on a checker piece
@@ -542,8 +547,10 @@
 
         }
       }
+      // checker piece has already been selected
       else if(pieceSelected[0] == true)
       {
+        //will run through the checkerPieceSelected function and not allow any other checker pieces to be clicked while the current chip is still selected.
         if(checkerPieceSelected(canvas_x,canvas_y) == true){
           redraw();
         }
