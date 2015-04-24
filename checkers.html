@@ -43,6 +43,7 @@
 
      readyState = false,
      pieceSelected = [false, null],
+     aJumpMoves = [/*index*/[/*boardX, boardY, pieceNum*/], []],
      checkerPieceArray,
 
      //Image vars
@@ -90,6 +91,7 @@
       this.y = null;
       this.boardX = null;
       this.boardY = null;
+      this.isKing = false;
 
 
       this.sayName = function(){
@@ -141,31 +143,158 @@
 
       // check for available moves around checkerPiece
       this.availableMoves = function(n){
-        var aMoves = [true, true, true, true];
+        if(checkerPieceArray[n].isKing == true){
+          var aMoves = [true, true, true, true];
 
-        // gather up potential moves
-        var pMoves = [[checkerPieceArray[n].boardX - 1, checkerPieceArray[n].boardY - 1],// top left
-        [checkerPieceArray[n].boardX + 1, checkerPieceArray[n].boardY - 1],// top right
-        [checkerPieceArray[n].boardX - 1, checkerPieceArray[n].boardY + 1],// bottom left
-        [checkerPieceArray[n].boardX + 1, checkerPieceArray[n].boardY + 1]];// bottom right
-        
-        // Evalute potential moves
-        // check to see if move is off board
-        for(u = 0; u < pMoves.length; u++){
-          if(pMoves[u][0] < 0 || pMoves[u][0] > 7 || pMoves[u][1] < 0 || pMoves[u][1] > 7){
-            aMoves[u] = false;
-          }
+          // gather up potential moves
+          var pMoves = [[checkerPieceArray[n].boardX - 1, checkerPieceArray[n].boardY - 1],// top left
+          [checkerPieceArray[n].boardX + 1, checkerPieceArray[n].boardY - 1],// top right
+          [checkerPieceArray[n].boardX - 1, checkerPieceArray[n].boardY + 1],// bottom left
+          [checkerPieceArray[n].boardX + 1, checkerPieceArray[n].boardY + 1]];// bottom right
+
+          // Evalute potential moves
+          // check to see if move is off board
+          for(u = 0; u < pMoves.length; u++){
+            if(pMoves[u][0] < 0 || pMoves[u][0] > 7 || pMoves[u][1] < 0 || pMoves[u][1] > 7){
+              aMoves[u] = false;
+            }
+          }   
+
+          // check to see if other chips are already placed around this chip
+          for(i = 0; i < checkerPieceArray.length; i++){
+            for(j = 0; j < pMoves.length; j++){
+              if(pMoves[j][0] == checkerPieceArray[i].boardX && pMoves[j][1] == checkerPieceArray[i].boardY){
+                // this means that there is a checker piece already located in an adjacent location to the selected chip and therefore it cannot be moved to that location
+                aMoves[j] = false;
+              }
+            }
+          }                 
         }
 
-        
-        // check to see if other chips are already placed around this chip
-        for(i = 0; i < checkerPieceArray.length; i++){
-          for(j = 0; j < pMoves.length; j++){
-            if(pMoves[j][0] == checkerPieceArray[i].boardX && pMoves[j][1] == checkerPieceArray[i].boardY){
-              // this means that there is a checker piece already located in an adjacent location to the selected chip and therefore it cannot be moved to that location
-              aMoves[j] = false;
+        else// checkerPieceArray[n].isKing == false
+
+        { 
+          var aMoves = [true, true];
+
+          // gather up potential moves for red chips
+          if(checkerPieceArray[n].team == "red"){
+            var pMoves = [
+            [checkerPieceArray[n].boardX - 1, checkerPieceArray[n].boardY - 1],// top left
+            [checkerPieceArray[n].boardX + 1, checkerPieceArray[n].boardY - 1]// top right
+            ];
+          }
+          else{ //checkerPieceArray[n].team == "black"
+            var pMoves = [
+            [checkerPieceArray[n].boardX - 1, checkerPieceArray[n].boardY + 1],// bottom left
+            [checkerPieceArray[n].boardX + 1, checkerPieceArray[n].boardY + 1]// bottom right
+            ];
+          }
+
+          // Evaluate potential moves
+          // check to see if move is off board
+          for(u = 0; u < pMoves.length; u++){
+            if(pMoves[u][0] < 0 || pMoves[u][0] > 7 || pMoves[u][1] < 0 || pMoves[u][1] > 7){
+              aMoves[u] = false;
             }
           }
+
+          // Check to see if other chips are already placed around this chip
+          for(i = 0; i < checkerPieceArray.length; i++){
+            for(j = 0; j < pMoves.length; j++){
+              if(pMoves[j][0] == checkerPieceArray[i].boardX && pMoves[j][1] == checkerPieceArray[i].boardY){
+                // this means that there is a checker piece already located in an adjacent location to the selected chip and therefore it cannot be moved to that location
+
+                //However, if that piece is on the opposite team, check if it can be jumped
+                if(redTurn == true){
+                  if(j == 0){ // top left
+                    if(checkerPieceArray[i].team == "black"){
+                      // check to see if any checker piece is behind the one trying to be jumped
+                      for(k = 0; k < checkerPieceArray.length; k++){
+                        if(pMoves[j][0] - 1 == checkerPieceArray[k].boardX && pMoves[j][1] - 1 == checkerPieceArray[k].boardY){
+                          aMoves[j] = false;
+                        }
+                      }
+                      if(aMoves[j] != false){ // jump can be made
+                        pMoves[j][0] -= 1;
+                        pMoves[j][1] -= 1;
+                        // store jump moves board coords and piece being jumped over
+                        aJumpMoves[j] = [pMoves[j][0], pMoves[j][1], i];
+                        // i represents number of piece being jumped over
+                      }
+                    }
+                    else{ // its a red piece in the way
+                      aMoves[j] = false;
+                    }
+                  }
+                  else if(j == 1){ // top right
+                    if(checkerPieceArray[i].team == "black"){
+                      // check to see if any checker piece is behind the one trying to be jumped
+                      for(k = 0; k < checkerPieceArray.length; k++){
+                        if(pMoves[j][0] + 1 == checkerPieceArray[k].boardX && pMoves[j][1] - 1 == checkerPieceArray[k].boardY){
+                          aMoves[j] = false;
+                        }
+                      }
+                      if(aMoves[j] != false){ // jump can be made
+                        pMoves[j][0] += 1;
+                        pMoves[j][1] -= 1;
+                        // store jump moves board coords and piece being jumped over
+                        aJumpMoves[j] = [pMoves[j][0], pMoves[j][1], i];
+                        /*window.alert("aJumpMoves[" + j + "]: \n" + "[1][0]: " + aJumpMoves[j][0] + "\n[1][1]: " + aJumpMoves[j][1] + "\n[1][2]: " + aJumpMoves[j][2]);*/
+                        // i represents number of piece being jumped over
+                      }
+                    }
+                    else{ // its a red piece in the way
+                      aMoves[j] = false;
+                    }
+                  }
+
+                }
+
+                else //redTurn == false
+
+                {
+                  if(j == 0){ // bottom left
+                    if(checkerPieceArray[i].team == "red"){
+                      // check to see if any checker piece is behind the one trying to be jumped
+                      for(k = 0; k < checkerPieceArray.length; k++){
+                        if(pMoves[j][0] - 1 == checkerPieceArray[k].boardX && pMoves[j][1] + 1 == checkerPieceArray[k].boardY){
+                          aMoves[j] = false;
+                        }
+                      }
+                      if(aMoves[j] != false){ // jump can be made
+                        pMoves[j][0] -= 1;
+                        pMoves[j][1] += 1;
+                        // store jump moves board coords and piece being jumped over
+                        aJumpMoves[j] = [pMoves[j][0], pMoves[j][1], i];
+                      }
+                    }
+                    else{ // its a black piece in the way
+                      aMoves[j] = false;
+                    }
+                  }
+                  else if(j == 1){ // bottom right
+                    if(checkerPieceArray[i].team == "red"){
+                      // check to see if any checker piece is behind the one trying to be jumped
+                      for(k = 0; k < checkerPieceArray.length; k++){
+                        if(pMoves[j][0] + 1 == checkerPieceArray[k].boardX && pMoves[j][1] + 1 == checkerPieceArray[k].boardY){
+                          aMoves[j] = false;
+                        }
+                      }
+                      if(aMoves[j] != false){ // jump can be made
+                        pMoves[j][0] += 1;
+                        pMoves[j][1] += 1;
+                        // store jump moves board coords and piece being jumped over
+                        aJumpMoves[j] = [pMoves[j][0], pMoves[j][1], i];
+                      }
+                    }
+                    else{ // its a black piece in the way
+                      aMoves[j] = false;
+                    }
+                  }
+                }
+              }
+            }
+          }      
         }
         // debug to show the effects of evaluating 
         /*for(k = 0; k < aMoves.length; k++){
@@ -190,170 +319,170 @@
 
       // MAIN INIT FUNCTION
      function init(){
-      // Initialize Canvas
-      canvas = document.getElementById("gameCanvas");
-      canvas.addEventListener("touchstart", touchDown, false);
-      canvas.addEventListener("mousedown", mouseDown, false);
+    // Initialize Canvas
+    canvas = document.getElementById("gameCanvas");
+    canvas.addEventListener("touchstart", touchDown, false);
+    canvas.addEventListener("mousedown", mouseDown, false);
+    
+    width = window.innerWidth;
+    height = window.innerHeight;
+
+    if(width >=750){
+      width = 750;
+      height = width;
+    }
+
+    canvas.style.border = "1px solid #000";
+    canvas.width = width;
+    canvas.height = height;
+    ctx = canvas.getContext("2d");
+
+    // Init checkerPiece game objects array
+    initCheckerPieceArray();
+
+    //Draw the starting layout of game to canvas
+
+    background = new Image();
+    redChips = checkerPieceArray[12].image;
+    blackChips = checkerPieceArray[0].image;
+    redChipsSelected = new Image();
+    blackChipsSelected = new Image();
+    aSquare = new Image();
+
+
+    background.src = 'Images/CheckerBoard.jpg';
+    redChips.src = checkerPieceArray[12].imageSource;
+    blackChips.src = checkerPieceArray[0].imageSource;
+    redChipsSelected.src = 'Images/RedCheckerSelected.png';
+    blackChipsSelected.src = 'Images/BlackCheckerSelected.png';
+    aSquare.src = 'Images/availableSquare.png';
+
+    // Wait for background/other images to load before drawing to canvas
+    background.onload = function()
+    {
+      // draw background
+      ctx.drawImage(background,0,0, width, height);
+
+      // draw checker pieces and assign images to checkerPieceArray objects.
       
-      width = window.innerWidth;
-      height = window.innerHeight;
+      var pieceNumber = 0;
+      // used to track the images as they are assigned to their respective checkerPieceArray objects.
 
-      if(width >=750){
-        width = 750;
-        height = width;
-      }
+      var loopCount = 0;
+      var placementCount = 0;
+      var everyOther;
 
-      canvas.style.border = "1px solid #000";
-      canvas.width = width;
-      canvas.height = height;
-      ctx = canvas.getContext("2d");
+      for(var j = 0; j < height; j += (height/8)){
 
-      // Init checkerPiece game objects array
-      initCheckerPieceArray();
+        // used to track which rows to draw the chips on.
+        loopCount++;
+         // probably not a necessary variable
 
-      //Draw the starting layout of game to canvas
+        for(var i = 0; i < width; i += (width/8)){
+          
+          placementCount++;
+          // used to skip spots on the board that shouldn't have a chip placed
 
-      background = new Image();
-      redChips = checkerPieceArray[12].image;
-      blackChips = checkerPieceArray[0].image;
-      redChipsSelected = new Image();
-      blackChipsSelected = new Image();
-      aSquare = new Image();
-
-
-      background.src = 'Images/CheckerBoard.jpg';
-      redChips.src = checkerPieceArray[12].imageSource;
-      blackChips.src = checkerPieceArray[0].imageSource;
-      redChipsSelected.src = 'Images/RedCheckerSelected.png';
-      blackChipsSelected.src = 'Images/BlackCheckerSelected.png';
-      aSquare.src = 'Images/availableSquare.png';
-
-      // Wait for background/other images to load before drawing to canvas
-      background.onload = function()
-      {
-        // draw background
-        ctx.drawImage(background,0,0, width, height);
-
-        // draw checker pieces and assign images to checkerPieceArray objects.
-        
-        var pieceNumber = 0;
-        // used to track the images as they are assigned to their respective checkerPieceArray objects.
-
-        var loopCount = 0;
-        var placementCount = 0;
-        var everyOther;
-
-        for(var j = 0; j < height; j += (height/8)){
-
-          // used to track which rows to draw the chips on.
-          loopCount++;
-           // probably not a necessary variable
-
-          for(var i = 0; i < width; i += (width/8)){
-            
-            placementCount++;
-            // used to skip spots on the board that shouldn't have a chip placed
-
-            // FOR BLACK CHIPS
-            if(loopCount <= 3)
-            {
-              if(loopCount == 1 || loopCount == 3)
-              {
-                if(placementCount == 1 || placementCount == 3 || placementCount == 5|| placementCount == 7) // draw chips in correct places for row 1 & 3
-                {
-                  // draw checker piece to screen
-                  ctx.drawImage(blackChips, i, j, (width/8), (height/8));
-
-                  // image coordinates for each checker piece
-                  checkerPieceArray[pieceNumber].setX(i);
-                  checkerPieceArray[pieceNumber].setY(j);
-
-                  // board location coordinates for each checker piece
-                  checkerPieceArray[pieceNumber].setBoardX(returnBoardX(i));
-                  checkerPieceArray[pieceNumber].setBoardY(returnBoardY(j));
-                  
-                  // add one to pieceNumber to help keep track of which location/images are being assigned to checkerPieceArray[].
-                  pieceNumber++;
-                }
-              }
-              else // loopCount == 2
-              {
-                if(placementCount == 2 || placementCount == 4 || placementCount == 6 || placementCount == 8) // draw chips in correct places for row 2
-                {
-                  // draw checker piece to screen
-                  ctx.drawImage(blackChips, i, j, (width/8), (height/8));
-
-                  // image coordinates for each checker piece
-                  checkerPieceArray[pieceNumber].setX(i);
-                  checkerPieceArray[pieceNumber].setY(j);
-
-                  // board location coordinates for each checker piece
-                  checkerPieceArray[pieceNumber].setBoardX(returnBoardX(i));
-                  checkerPieceArray[pieceNumber].setBoardY(returnBoardY(j));
-
-                  // add one to pieceNumber to help keep track of which location/images are being assigned to checkerPieceArray.
-                  pieceNumber++;
-                }
-              }
-            }
-            else // FOR RED CHIPS
-            {
-              if(loopCount == 6 || loopCount == 8)
-              {
-                if(placementCount == 2 || placementCount == 4 || placementCount == 6 || placementCount == 8)// draw chips in correct places for row 6 & 8
-                {
-                  // draw checker piece to screen
-                  ctx.drawImage(redChips, i, j, (width/8), (height/8));
-
-                  // image coordinates for each checker piece
-                  checkerPieceArray[pieceNumber].setX(i);
-                  checkerPieceArray[pieceNumber].setY(j);
-
-                  // board location coordinates for each checker piece
-                  checkerPieceArray[pieceNumber].setBoardX(returnBoardX(i));
-                  checkerPieceArray[pieceNumber].setBoardY(returnBoardY(j));
-
-                  // add one to pieceNumber to help keep track of which location/images are being assigned to checkerPieceArray.
-                  pieceNumber++;
-                }
-              }
-              else // loopCount == 7
-              {
-                if(placementCount == 1 || placementCount == 3 || placementCount == 5 || placementCount == 7)// draw chips in correct places for row 7
-                {
-                  // draw checker piece to screen
-                  ctx.drawImage(redChips, i, j, (width/8), (height/8));
-
-                  // image coordinates for each checker piece
-                  checkerPieceArray[pieceNumber].setX(i);
-                  checkerPieceArray[pieceNumber].setY(j);
-
-                  // board location coordinates for each checker piece
-                  checkerPieceArray[pieceNumber].setBoardX(returnBoardX(i));
-                  checkerPieceArray[pieceNumber].setBoardY(returnBoardY(j));
-
-                  // add one to pieceNumber to help keep track of which location/images are being assigned to checkerPieceArray.
-                  pieceNumber++;
-                }
-              }
-            }
-          }
-
-          if(loopCount == 3) // skip middle two rows
+          // FOR BLACK CHIPS
+          if(loopCount <= 3)
           {
-            j += 2*(height/8);
-            loopCount++; // skipped two loopCounts so they need to be added here.
-            loopCount++;
-          }
-          placementCount = 0;
-        }
-        // after background .onload has run, change readyState and reiterate through main() so that game can progress with all data loaded.
-        readyState = true;
-        main();
-      };
+            if(loopCount == 1 || loopCount == 3)
+            {
+              if(placementCount == 1 || placementCount == 3 || placementCount == 5|| placementCount == 7) // draw chips in correct places for row 1 & 3
+              {
+                // draw checker piece to screen
+                ctx.drawImage(blackChips, i, j, (width/8), (height/8));
 
-      // not necessary for functionality
-      // initBoardArray();
+                // image coordinates for each checker piece
+                checkerPieceArray[pieceNumber].setX(i);
+                checkerPieceArray[pieceNumber].setY(j);
+
+                // board location coordinates for each checker piece
+                checkerPieceArray[pieceNumber].setBoardX(returnBoardX(i));
+                checkerPieceArray[pieceNumber].setBoardY(returnBoardY(j));
+                
+                // add one to pieceNumber to help keep track of which location/images are being assigned to checkerPieceArray[].
+                pieceNumber++;
+              }
+            }
+            else // loopCount == 2
+            {
+              if(placementCount == 2 || placementCount == 4 || placementCount == 6 || placementCount == 8) // draw chips in correct places for row 2
+              {
+                // draw checker piece to screen
+                ctx.drawImage(blackChips, i, j, (width/8), (height/8));
+
+                // image coordinates for each checker piece
+                checkerPieceArray[pieceNumber].setX(i);
+                checkerPieceArray[pieceNumber].setY(j);
+
+                // board location coordinates for each checker piece
+                checkerPieceArray[pieceNumber].setBoardX(returnBoardX(i));
+                checkerPieceArray[pieceNumber].setBoardY(returnBoardY(j));
+
+                // add one to pieceNumber to help keep track of which location/images are being assigned to checkerPieceArray.
+                pieceNumber++;
+              }
+            }
+          }
+          else // FOR RED CHIPS
+          {
+            if(loopCount == 6 || loopCount == 8)
+            {
+              if(placementCount == 2 || placementCount == 4 || placementCount == 6 || placementCount == 8)// draw chips in correct places for row 6 & 8
+              {
+                // draw checker piece to screen
+                ctx.drawImage(redChips, i, j, (width/8), (height/8));
+
+                // image coordinates for each checker piece
+                checkerPieceArray[pieceNumber].setX(i);
+                checkerPieceArray[pieceNumber].setY(j);
+
+                // board location coordinates for each checker piece
+                checkerPieceArray[pieceNumber].setBoardX(returnBoardX(i));
+                checkerPieceArray[pieceNumber].setBoardY(returnBoardY(j));
+
+                // add one to pieceNumber to help keep track of which location/images are being assigned to checkerPieceArray.
+                pieceNumber++;
+              }
+            }
+            else // loopCount == 7
+            {
+              if(placementCount == 1 || placementCount == 3 || placementCount == 5 || placementCount == 7)// draw chips in correct places for row 7
+              {
+                // draw checker piece to screen
+                ctx.drawImage(redChips, i, j, (width/8), (height/8));
+
+                // image coordinates for each checker piece
+                checkerPieceArray[pieceNumber].setX(i);
+                checkerPieceArray[pieceNumber].setY(j);
+
+                // board location coordinates for each checker piece
+                checkerPieceArray[pieceNumber].setBoardX(returnBoardX(i));
+                checkerPieceArray[pieceNumber].setBoardY(returnBoardY(j));
+
+                // add one to pieceNumber to help keep track of which location/images are being assigned to checkerPieceArray.
+                pieceNumber++;
+              }
+            }
+          }
+        }
+
+        if(loopCount == 3) // skip middle two rows
+        {
+          j += 2*(height/8);
+          loopCount++; // skipped two loopCounts so they need to be added here.
+          loopCount++;
+        }
+        placementCount = 0;
+      }
+      // after background .onload has run, change readyState and reiterate through main() so that game can progress with all data loaded.
+      readyState = true;
+      main();
+    };
+
+    // not necessary for functionality
+    // initBoardArray();
      }
 
 
@@ -521,6 +650,7 @@
         //will run through the checkerPieceSelected function and not allow any other checker pieces to be clicked while the current chip is still selected.
         if(checkerPieceSelected(canvas_x,canvas_y) == true){
           redraw();
+          // deselect current chip if clicked again
         }
         else
         {
@@ -571,118 +701,150 @@
       var box;
       // load box[] with coordinates that belong to each checker piece
       if(redTurn == true){
-        for(i = 12; i < checkerPieceArray.length; i++){
-          var x1, x2, y1, y2;
-          x1 = checkerPieceArray[i].x;
-          x2 = x1 + (width/8);
-          y1 = checkerPieceArray[i].y;
-          y2 = y1 + (height/8);
-          box = [x1, x2, y1, y2];
-          // check if click was within the box area around checker piece
-          if(x >= box[0] && x <= box[1]){
-            if(y >= box[2] && y <= box[3]){
-              // if checker piece is already selected, deselect it
-              if(pieceSelected[1] == i){
-                unselectedImage(i);
-                pieceSelected[1] = null;
-                pieceSelected[0] = false;
-              }
-              else // if checker piece has not been selected yet, select it
-              {
-                //update image source of chip clicked on with "selected" image of itself
-                if(pieceSelected[1] == null){
-                  selectedImage(i);
-                  pieceSelected[1] = i;
-                  pieceSelected[0] = true;
-                }else{
-                  // a piece is selected and the user just clicked on a different piece.
-                  // this stops the game from calling redraw(); when not deselecting his own piece.
-
-
-                  //later this will include actions to be taken when moving to an available space.
-                  return false;
+        for(i = 0; i < checkerPieceArray.length; i++){
+          if(checkerPieceArray[i].team == 'red'){
+            var x1, x2, y1, y2;
+            x1 = checkerPieceArray[i].x;
+            x2 = x1 + (width/8);
+            y1 = checkerPieceArray[i].y;
+            y2 = y1 + (height/8);
+            box = [x1, x2, y1, y2];
+            // check if click was within the box area around checker piece
+            if(x >= box[0] && x <= box[1]){
+              if(y >= box[2] && y <= box[3]){
+                // if checker piece is already selected, deselect it
+                if(pieceSelected[1] == i){
+                  unselectedImage(i);
+                  pieceSelected[1] = null;
+                  pieceSelected[0] = false;
                 }
+                else // if checker piece has not been selected yet, select it
+                {
+                  //update image source of chip clicked on with "selected" image of itself
+                  if(pieceSelected[1] == null){
+                    selectedImage(i);
+                    pieceSelected[1] = i;
+                    pieceSelected[0] = true;
+                  }else{
+                    // a piece is selected and the user just clicked on a different piece.
+                    // this stops the game from calling redraw(); when not deselecting his own piece.
+
+
+                    //later this will include actions to be taken when moving to an available space.
+                    return false;
+                  }
+                }
+                return true;
               }
-              return true;
             }
           }
         }
       }
       else // redTurn == false
       {
-        for(i = 0; i < checkerPieceArray.length/2; i++){
-        var x1, x2, y1, y2;
-        x1 = checkerPieceArray[i].x;
-        x2 = x1 + (width/8);
-        y1 = checkerPieceArray[i].y;
-        y2 = y1 + (height/8);
-        box = [x1, x2, y1, y2];
-        // check if click was within the box area around checker piece
-        if(x >= box[0] && x <= box[1]){
-          if(y >= box[2] && y <= box[3]){
-            // if checker piece is already selected, deselect it
-                          // if checker piece is already selected, deselect it
-              if(pieceSelected[1] == i){
-                unselectedImage(i);
-                pieceSelected[1] = null;
-                pieceSelected[0] = false;
-              }
-              else // if checker piece has not been selected yet, select it
-              {
-                //update image source of chip clicked on with "selected" image of itself
-                if(pieceSelected[1] == null){
-                  selectedImage(i);
-                  pieceSelected[1] = i;
-                  pieceSelected[0] = true;
-                }else{
-                  // a piece is selected and the user just clicked on a different piece.
-                  // this stops the game from calling redraw(); when not deselecting his own piece.
+        for(i = 0; i < checkerPieceArray.length; i++){
+          if(checkerPieceArray[i].team == 'black'){
+            var x1, x2, y1, y2;
+            x1 = checkerPieceArray[i].x;
+            x2 = x1 + (width/8);
+            y1 = checkerPieceArray[i].y;
+            y2 = y1 + (height/8);
+            box = [x1, x2, y1, y2];
+            // check if click was within the box area around checker piece
+            if(x >= box[0] && x <= box[1]){
+              if(y >= box[2] && y <= box[3]){
+                // if checker piece is already selected, deselect it
+                              // if checker piece is already selected, deselect it
+                  if(pieceSelected[1] == i){
+                    unselectedImage(i);
+                    pieceSelected[1] = null;
+                    pieceSelected[0] = false;
+                  }
+                  else // if checker piece has not been selected yet, select it
+                  {
+                    //update image source of chip clicked on with "selected" image of itself
+                    if(pieceSelected[1] == null){
+                      selectedImage(i);
+                      pieceSelected[1] = i;
+                      pieceSelected[0] = true;
+                    }else{
+                      // a piece is selected and the user just clicked on a different piece.
+                      // this stops the game from calling redraw(); when not deselecting his own piece.
 
 
-                  //later this will include actions to be taken when moving to an available space.
-                  return false;
-                }
+                      //later this will include actions to be taken when moving to an available space.
+                      return false;
+                    }
+                  }
+                return true;
               }
-            return true;
+            }
           }
         }
       }
-     }
       
       return false;
      }
 
      function movePiece(x, y, n){
-      // get box coord from click
-      // see if click is in one of the available moves...
-      // update selected piece's coords
-      // make condition in mouseDown() to call redraw();
-      //window.alert("ran");
+
       var moves = checkerPieceArray[n].availableMoves(n);
       var aMoves = moves[0];
       var pMoves = moves[1];
       var intX = returnBoardX(x);
       var intY = returnBoardY(y);
+      var pieceToKill = [false, null];
+
+
+      // run through available moves
       for(i = 0; i < aMoves.length; i++){
+        // if move is available and click coordinates are within board coords..
         if(aMoves[i] == true && intX == pMoves[i][0] && intY == pMoves[i][1]){
+          // then, update the selected checker piece's coords to the new coords
           checkerPieceArray[n].setBoardX(intX);
           checkerPieceArray[n].setBoardY(intY);
           checkerPieceArray[n].setX(intX * (width/8));
           checkerPieceArray[n].setY(intY * (height/8));
-          /*window.alert("ran: \n" + "checkerPieceArray[" + n + "] \n" + 
-            "boardX: " + intX + "\nboardY: " + intY + "\nX: " + (intX * (width/8)) + "\nY: " + (intY * (height/8)));*/
+
+          // run through stored available jump moves if there are any
+          if(aJumpMoves[0][0] != undefined || aJumpMoves[1][0] != undefined){
+            for(j = 0; j < aJumpMoves.length; j++){
+              // if move made by player is one of the jump moves, kill the piece that was jumped over
+              if(intX == aJumpMoves[j][0] && intY == aJumpMoves[j][1]){
+                pieceToKill = [true, aJumpMoves[j][2]];
+                window.alert(aJumpMoves[j][0] + ", " + aJumpMoves[j][1] + ", " + aJumpMoves[j][2]);
+              }
+            }
+          }
+          // change image of chip back to its unselected image
           unselectedImage(n);
+
+          // Make sure there is a piece to be killed, then kill it
+          if(pieceToKill[0] == true){
+            kill(pieceToKill[1]);
+            pieceToKill = [false, null];
+            aJumpMoves = [[],[]];
+          }
+
+          // reset pieceSelected for next turn
           pieceSelected[0] = false;
           pieceSelected[1] = null;
+
+          // toggle turn switching
           if(redTurn == true){
             redTurn = false;
           }
           else{
             redTurn = true;
           }
+          // update board to reflect changes
           redraw();
         }
       }
+     }
+
+     function kill(n){
+      checkerPieceArray.splice(n,1);
      }
 
      function redraw(){
@@ -710,7 +872,7 @@
      // simply used to change image source of a checkerpiece to its selected couterpart and then refresh that checker piece's image object
      function selectedImage(i){
       // blackCheckerSelected
-      if(i < 12){
+      if(checkerPieceArray[i].team == 'black'){
         checkerPieceArray[i].imageSource = "Images/BlackCheckerSelected.png";
         checkerPieceArray[i].createImage();
       }
@@ -724,7 +886,7 @@
      // simply used to change image source of a checkerpiece back to its unselected image source.
      function unselectedImage(i){
       // blackCheckerSelected
-      if(i < 12){
+      if(checkerPieceArray[i].team == 'black'){
         checkerPieceArray[i].imageSource = "Images/BlackChecker.png";
         checkerPieceArray[i].createImage();
       }
