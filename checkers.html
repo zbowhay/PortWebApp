@@ -72,9 +72,9 @@
       else // readyState == true // Begin gameplay
       {
         window.alert("red goes first!");
-        // refresh the canvas three times after initial load to avoid any images not showing up on canvas
-        redraw(); redraw(); redraw();
-        //checkerPieceArray[9].availableMoves(9);
+        // refresh the canvas ten times after initial load to avoid any images not showing up on canvas
+        refreshRedraw(10);
+        
       }
      }
 
@@ -90,7 +90,6 @@
       this.y = null;
       this.boardX = null;
       this.boardY = null;
-
 
 
       this.sayName = function(){
@@ -359,7 +358,7 @@
 
 
       // INITCHECKERPIECEARRAY FUNCTION
-      function initCheckerPieceArray(){
+     function initCheckerPieceArray(){
       checkerPieceArray = [];
       var nameString;
       window.alert("creating checkerPieceArray...");
@@ -380,10 +379,6 @@
         }
       } 
      }
-      // May or may not need.. could clean up mouseDown eventListener
-      function updateCheckerPieceArray(){
-
-      }
 
 
      //INITBOARDARRAY FUNCTION
@@ -527,6 +522,11 @@
         if(checkerPieceSelected(canvas_x,canvas_y) == true){
           redraw();
         }
+        else
+        {
+          movePiece(canvas_x, canvas_y, pieceSelected[1]);
+          // move current chip to available position clicked on
+        }
       }
      }
 
@@ -552,7 +552,13 @@
       {
         //will run through the checkerPieceSelected function and not allow any other checker pieces to be clicked while the current chip is still selected.
         if(checkerPieceSelected(canvas_x,canvas_y) == true){
+          // deselect current chip if clicked again
           redraw();
+        }
+        else
+        {
+          movePiece(canvas_x, canvas_y, pieceSelected[1]);
+          // move current chip to available position clicked on
         }
       }
      }
@@ -646,6 +652,39 @@
       return false;
      }
 
+     function movePiece(x, y, n){
+      // get box coord from click
+      // see if click is in one of the available moves...
+      // update selected piece's coords
+      // make condition in mouseDown() to call redraw();
+      //window.alert("ran");
+      var moves = checkerPieceArray[n].availableMoves(n);
+      var aMoves = moves[0];
+      var pMoves = moves[1];
+      var intX = returnBoardX(x);
+      var intY = returnBoardY(y);
+      for(i = 0; i < aMoves.length; i++){
+        if(aMoves[i] == true && intX == pMoves[i][0] && intY == pMoves[i][1]){
+          checkerPieceArray[n].setBoardX(intX);
+          checkerPieceArray[n].setBoardY(intY);
+          checkerPieceArray[n].setX(intX * (width/8));
+          checkerPieceArray[n].setY(intY * (height/8));
+          /*window.alert("ran: \n" + "checkerPieceArray[" + n + "] \n" + 
+            "boardX: " + intX + "\nboardY: " + intY + "\nX: " + (intX * (width/8)) + "\nY: " + (intY * (height/8)));*/
+          unselectedImage(n);
+          pieceSelected[0] = false;
+          pieceSelected[1] = null;
+          if(redTurn == true){
+            redTurn = false;
+          }
+          else{
+            redTurn = true;
+          }
+          redraw();
+        }
+      }
+     }
+
      function redraw(){
       // draw background over old board
       ctx.drawImage(background, 0, 0, width, height);
@@ -695,6 +734,14 @@
         checkerPieceArray[i].createImage();
       }
      }
+
+     // called after first intialization of canvas to refresh it a few times in case background.jpg loaded before the other images that require loading as well
+     function refreshRedraw(n){
+      for(i = 0; i < n; i++){
+        redraw();
+      }
+     }
+
 
     </script>
   </body>
