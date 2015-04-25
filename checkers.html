@@ -49,9 +49,13 @@
      //Image vars
      background,
      redChips,
-     blackChips,
      redChipsSelected,
+     redChipsKing,
+     redChipsKingSelected,
+     blackChips,
      blackChipsSelected,
+     blackChipsKing,
+     blackChipsKingSelected,
      aSquare,
 
      redTurn = true;
@@ -347,6 +351,10 @@
     blackChips = checkerPieceArray[0].image;
     redChipsSelected = new Image();
     blackChipsSelected = new Image();
+    blackChipsKing = new Image();
+    blackChipsKingSelected = new Image();
+    redChipsKing = new Image();
+    redChipsKingSelected = new Image();
     aSquare = new Image();
 
 
@@ -355,6 +363,10 @@
     blackChips.src = checkerPieceArray[0].imageSource;
     redChipsSelected.src = 'Images/RedCheckerSelected.png';
     blackChipsSelected.src = 'Images/BlackCheckerSelected.png';
+    blackChipsKing.src = 'Images/BlackCheckerKing.png'
+    blackChipsKingSelected.src = 'Images/BlackCheckerKingSelected.png'
+    redChipsKing.src = 'Images/RedCheckerKing.png';
+    redChipsKingSelected.src = 'Images/RedCheckerKingSelected.png';
     aSquare.src = 'Images/availableSquare.png';
 
     // Wait for background/other images to load before drawing to canvas
@@ -658,6 +670,7 @@
           // move current chip to available position clicked on
         }
       }
+      checkForKings();
      }
 
      function mouseDown(){
@@ -691,6 +704,7 @@
           // move current chip to available position clicked on
         }
       }
+      checkForKings();
      }
 
 
@@ -841,6 +855,25 @@
           redraw();
         }
       }
+      // check to see if any checker pieces have become kings
+      
+     }
+
+     // check if any pieces have become king pieces and update them accordingly
+     function checkForKings(){
+      for(i = 0; i < checkerPieceArray.length; i++){
+        var temp = checkerPieceArray[i];
+        if(temp.team == 'black' && temp.boardY == 6){
+          temp.isKing = true;
+          temp.imageSource = 'Images/BlackCheckerKing.png';
+          temp.createImage();
+        }
+        if(temp.team == 'red' && temp.boardY == 0){
+          temp.isKing = true;
+          temp.imageSource = 'Images/RedCheckerKing.png';
+          temp.createImage();
+        }
+      }
      }
 
      function kill(n){
@@ -871,29 +904,57 @@
 
      // simply used to change image source of a checkerpiece to its selected couterpart and then refresh that checker piece's image object
      function selectedImage(i){
-      // blackCheckerSelected
-      if(checkerPieceArray[i].team == 'black'){
-        checkerPieceArray[i].imageSource = "Images/BlackCheckerSelected.png";
-        checkerPieceArray[i].createImage();
+      var temp = checkerPieceArray[i];
+
+      // BlackCheckerKingSelected
+      if(temp.team == 'black' && temp.isKing == true){
+        temp.imageSource = 'Images/BlackCheckerKingSelected.png';
+        temp.createImage();
       }
-      else // redCheckerSelected
+      // BlackCheckerSelected
+      if(temp.team == 'black' && temp.isKing == false){
+        temp.imageSource = "Images/BlackCheckerSelected.png";
+        temp.createImage();
+      }
+
+      // RedCheckerKingSelected
+      if(temp.team == 'red' && temp.isKing == true){
+        temp.imageSource = 'Images/RedCheckerKingSelected.png';
+        temp.createImage();
+      }
+      // RedCheckerSelected
+      if(temp.team == 'red' && temp.isKing == false)
       {
-        checkerPieceArray[i].imageSource = "Images/RedCheckerSelected.png";
-        checkerPieceArray[i].createImage();
+        temp.imageSource = "Images/RedCheckerSelected.png";
+        temp.createImage();
       }
      }
 
      // simply used to change image source of a checkerpiece back to its unselected image source.
      function unselectedImage(i){
-      // blackCheckerSelected
-      if(checkerPieceArray[i].team == 'black'){
-        checkerPieceArray[i].imageSource = "Images/BlackChecker.png";
-        checkerPieceArray[i].createImage();
+      var temp = checkerPieceArray[i];
+
+      // BlackCheckerKing
+      if(temp.team == 'black' && temp.isKing == true){
+        temp.imageSource = 'Images/BlackCheckerKing.png';
+        temp.createImage();
       }
-      else // redCheckerSelected
+      // BlackChecker
+      if(temp.team == 'black' && temp.isKing == false){
+        temp.imageSource = "Images/BlackChecker.png";
+        temp.createImage();
+      }
+
+      // RedCheckerKing
+      if(temp.team == 'red' && temp.isKing == true){
+        temp.imageSource = 'Images/RedCheckerKing.png';
+        temp.createImage();
+      }
+      // RedChecker
+      if(temp.team == 'red' && temp.isKing == false)
       {
-        checkerPieceArray[i].imageSource = "Images/RedChecker.png";
-        checkerPieceArray[i].createImage();
+        temp.imageSource = "Images/RedChecker.png";
+        temp.createImage();
       }
      }
 
