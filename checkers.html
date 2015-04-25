@@ -145,6 +145,10 @@
         'BoardY: ' + checkerPieceArray[arrayPosition].boardY);
       };
 
+      //function isMoveOffBoard(pmovesArray){
+
+     // };
+
       // check for available moves around checkerPiece
       this.availableMoves = function(n){
         if(checkerPieceArray[n].isKing == true){
@@ -217,6 +221,10 @@
                         if(pMoves[j][0] - 1 == checkerPieceArray[k].boardX && pMoves[j][1] - 1 == checkerPieceArray[k].boardY){
                           aMoves[j] = false;
                         }
+                        // make sure jump isn't off board
+                        if(pMoves[j][0] - 1 < 0 || pMoves[j][1] - 1 < 0){
+                          aMoves[j] = false;
+                        }
                       }
                       if(aMoves[j] != false){ // jump can be made
                         pMoves[j][0] -= 1;
@@ -235,6 +243,10 @@
                       // check to see if any checker piece is behind the one trying to be jumped
                       for(k = 0; k < checkerPieceArray.length; k++){
                         if(pMoves[j][0] + 1 == checkerPieceArray[k].boardX && pMoves[j][1] - 1 == checkerPieceArray[k].boardY){
+                          aMoves[j] = false;
+                        }
+                        // make sure jump isn't off board
+                        if(pMoves[j][0] + 1 > 7 || pMoves[j][1] - 1 < 0){
                           aMoves[j] = false;
                         }
                       }
@@ -264,6 +276,11 @@
                         if(pMoves[j][0] - 1 == checkerPieceArray[k].boardX && pMoves[j][1] + 1 == checkerPieceArray[k].boardY){
                           aMoves[j] = false;
                         }
+                        // make sure jump isn't off board
+                        if(pMoves[j][0] - 1 < 0 || pMoves[j][1] + 1 > 7){
+                          aMoves[j] = false;
+                        }
+
                       }
                       if(aMoves[j] != false){ // jump can be made
                         pMoves[j][0] -= 1;
@@ -281,6 +298,10 @@
                       // check to see if any checker piece is behind the one trying to be jumped
                       for(k = 0; k < checkerPieceArray.length; k++){
                         if(pMoves[j][0] + 1 == checkerPieceArray[k].boardX && pMoves[j][1] + 1 == checkerPieceArray[k].boardY){
+                          aMoves[j] = false;
+                        }
+                        // make sure jump isn't off board
+                        if(pMoves[j][0] + 1 > 7 || pMoves[j][1] + 1 > 7){
                           aMoves[j] = false;
                         }
                       }
@@ -502,7 +523,7 @@
      function initCheckerPieceArray(){
       checkerPieceArray = [];
       var nameString;
-      window.alert("creating checkerPieceArray...");
+      
       for(a = 0; a < 24; a++)
       {
 
@@ -519,47 +540,6 @@
           checkerPieceArray[a].createImage();
         }
       } 
-     }
-
-
-     //INITBOARDARRAY FUNCTION
-     // not a necessary function
-     function initBoardArray(){
-      var boardArray = [];
-
-      var boardArrayString = "";
-
-      for (var i = 0; i < 8; i++) {
-        for(var j = 0; j < 8; j++){
-          boardArray.push([i,j]);
-        }
-        //Visual representation of Checker board array in a String for dev.
-        if(i > 0){
-          boardArrayString += boardArray.toString().substring(i*(4*8),(i+1)*(4*8)) + "\n";
-        }else{
-          boardArrayString += boardArray.toString() + "\n";
-        }
-      };
-
-      // Visual representation of Checker board boardArray for development
-      for(var a = 0; a < boardArrayString.length; a = a + 4){
-        var temp = a;
-        temp += 4;
-        if(temp > boardArrayString.length){
-         break;
-        }
-        else if(a == 0){
-          boardArrayString = insert(0,"[", boardArrayString);
-          a++;
-        }
-        else{
-          boardArrayString = insert(a,"][", boardArrayString);
-          a += 2;
-        }
-      }
-
-      // For Development Purposes
-      window.alert("INIT BOARD ARRAY: \n " + boardArrayString);
      }
 
 
@@ -625,12 +605,6 @@
         window.alert("Something went wrong with returnBoardX");
       }
       return null;
-     }
-
-     function checkerPieceArrayDebug(pieceNumber){
-      window.alert("checkerPieceArray Debug: \n"
-       + "checkerPieceArray[" + pieceNumber + "] X = " + checkerPieceArray[pieceNumber].boardX + "\n"
-       + "checkerPieceArray[" + pieceNumber + "] Y = " + checkerPieceArray[pieceNumber].boardY);
      }
 
     // EVENT CONTROLLERS
@@ -826,10 +800,11 @@
               // if move made by player is one of the jump moves, kill the piece that was jumped over
               if(intX == aJumpMoves[j][0] && intY == aJumpMoves[j][1]){
                 pieceToKill = [true, aJumpMoves[j][2]];
-                window.alert(aJumpMoves[j][0] + ", " + aJumpMoves[j][1] + ", " + aJumpMoves[j][2]);
               }
             }
+            aJumpMoves = [[],[]];
           }
+
           // change image of chip back to its unselected image
           unselectedImage(n);
 
@@ -838,6 +813,18 @@
             kill(pieceToKill[1]);
             pieceToKill = [false, null];
             aJumpMoves = [[],[]];
+
+            // check to see if another jump is available
+            if(redTurn == true){
+              // since a red is killing a black it will decrease the array by one piece NEXT turn so when you run available moves next turn you need to run it for the position that this red checker piece will be in in the array
+              moves = checkerPieceArray[n-1].availableMoves(n-1);
+              // reloads aJumpMoves if there are any available
+            }
+            else// black turn
+            {
+              moves = checkerPieceArray[n].availableMoves(n);
+              // reloads aJumpMoves if there are any available
+            }
           }
 
           // reset pieceSelected for next turn
@@ -845,12 +832,9 @@
           pieceSelected[1] = null;
 
           // toggle turn switching
-          if(redTurn == true){
-            redTurn = false;
-          }
-          else{
-            redTurn = true;
-          }
+          toggleTurn();
+          aJumpMoves = [[],[]];
+          
           // update board to reflect changes
           redraw();
         }
@@ -859,11 +843,26 @@
       
      }
 
+     function toggleTurn(){
+      if(aJumpMoves[0][0] != undefined || aJumpMoves[1][0] != undefined){
+        if(redTurn == true){
+          //let red go again, there is another jump move available
+        }else if(redTurn == false){
+          //let black go again, there is another jump move available
+        }
+      }
+      else if(redTurn == true){
+        redTurn = false;
+      }else if(redTurn == false){
+        redTurn = true;
+      }
+     }
+
      // check if any pieces have become king pieces and update them accordingly
      function checkForKings(){
       for(i = 0; i < checkerPieceArray.length; i++){
         var temp = checkerPieceArray[i];
-        if(temp.team == 'black' && temp.boardY == 6){
+        if(temp.team == 'black' && temp.boardY == 7){
           temp.isKing = true;
           temp.imageSource = 'Images/BlackCheckerKing.png';
           temp.createImage();
@@ -876,6 +875,7 @@
       }
      }
 
+     // removes checker piece n
      function kill(n){
       checkerPieceArray.splice(n,1);
      }
