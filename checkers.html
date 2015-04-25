@@ -43,7 +43,7 @@
 
      readyState = false,
      pieceSelected = [false, null],
-     aJumpMoves = [/*index*/[/*boardX, boardY, pieceNum*/], []],
+     aJumpMoves = [/*index*/[/*boardX, boardY, pieceNum*/], [], [], []],
      checkerPieceArray,
 
      //Image vars
@@ -78,8 +78,7 @@
       {
         window.alert("red goes first!");
         // refresh the canvas ten times after initial load to avoid any images not showing up on canvas
-        refreshRedraw(10);
-        
+        refreshRedraw(10);        
       }
      }
 
@@ -173,7 +172,216 @@
             for(j = 0; j < pMoves.length; j++){
               if(pMoves[j][0] == checkerPieceArray[i].boardX && pMoves[j][1] == checkerPieceArray[i].boardY){
                 // this means that there is a checker piece already located in an adjacent location to the selected chip and therefore it cannot be moved to that location
-                aMoves[j] = false;
+                
+                //However, if that piece is on the opposite team, check if it can be jumped
+                if(redTurn == true){
+                  if(j == 0) // top left
+                  {
+                    // if adjacent piece is an enemy piece
+                    if(checkerPieceArray[i].team == 'black'){
+                      // check to see if any checker piece is behind it or not so that it can be jumped
+                      for(k = 0; k < checkerPieceArray.length; k++){
+                        if(pMoves[j][0] - 1 == checkerPieceArray[k].boardX && pMoves[j][1] - 1 == checkerPieceArray[k].boardY){
+                          aMoves[j] = false;
+                        }
+                        // make sure jump isn't off board
+                        if(pMoves[j][0] - 1 < 0 || pMoves[j][1] - 1 < 0){
+                          aMoves[j] = false;
+                        }
+                      }
+                      if(aMoves[j] != false){ // jump can be made
+                        pMoves[j][0] -= 1;
+                        pMoves[j][1] -= 1;
+                        // store jump moves board coords and piece being jumped over
+                        aJumpMoves[j] = [pMoves[j][0], pMoves[j][1], i];
+                        // i represents number of piece being jumped over
+                      }
+                    }
+                    else // the adjacent piece is red, therefore it can't be jumped
+                    {
+                      aMoves[j] = false;
+                    }
+                  }
+                  else if(j == 1)// top right
+                  {
+                    if(checkerPieceArray[i].team == "black"){
+                      // check to see if any checker piece is behind the one trying to be jumped
+                      for(k = 0; k < checkerPieceArray.length; k++){
+                        if(pMoves[j][0] + 1 == checkerPieceArray[k].boardX && pMoves[j][1] - 1 == checkerPieceArray[k].boardY){
+                          aMoves[j] = false;
+                        }
+                        // make sure jump isn't off board
+                        if(pMoves[j][0] + 1 > 7 || pMoves[j][1] - 1 < 0){
+                          aMoves[j] = false;
+                        }
+                      }
+                      if(aMoves[j] != false){ // jump can be made
+                        pMoves[j][0] += 1;
+                        pMoves[j][1] -= 1;
+                        // store jump moves board coords and piece being jumped over
+                        aJumpMoves[j] = [pMoves[j][0], pMoves[j][1], i];
+                        // i represents number of piece being jumped over
+                      }
+                    }
+                    else{ // its a red piece in the way
+                      aMoves[j] = false;
+                    }
+                  }
+                  else if(j == 2)// bottom left
+                  {
+                    if(checkerPieceArray[i].team == "black"){
+                      // check to see if any checker piece is behind the one trying to be jumped
+                      for(k = 0; k < checkerPieceArray.length; k++){
+                        if(pMoves[j][0] - 1 == checkerPieceArray[k].boardX && pMoves[j][1] + 1 == checkerPieceArray[k].boardY){
+                          aMoves[j] = false;
+                        }
+                        // make sure jump isn't off board
+                        if(pMoves[j][0] - 1 < 0 || pMoves[j][1] + 1 > 7){
+                          aMoves[j] = false;
+                        }
+
+                      }
+                      if(aMoves[j] != false){ // jump can be made
+                        pMoves[j][0] -= 1;
+                        pMoves[j][1] += 1;
+                        // store jump moves board coords and piece being jumped over
+                        aJumpMoves[j] = [pMoves[j][0], pMoves[j][1], i];
+                      }
+                    }
+                    else{ // its a red piece in the way
+                      aMoves[j] = false;
+                    }
+                  }
+                  else if(j == 3)// bottom right
+                  {
+                    if(checkerPieceArray[i].team == "black"){
+                      // check to see if any checker piece is behind the one trying to be jumped
+                      for(k = 0; k < checkerPieceArray.length; k++){
+                        if(pMoves[j][0] + 1 == checkerPieceArray[k].boardX && pMoves[j][1] + 1 == checkerPieceArray[k].boardY){
+                          aMoves[j] = false;
+                        }
+                        // make sure jump isn't off board
+                        if(pMoves[j][0] + 1 > 7 || pMoves[j][1] + 1 > 7){
+                          aMoves[j] = false;
+                        }
+                      }
+                      if(aMoves[j] != false){ // jump can be made
+                        pMoves[j][0] += 1;
+                        pMoves[j][1] += 1;
+                        // store jump moves board coords and piece being jumped over
+                        aJumpMoves[j] = [pMoves[j][0], pMoves[j][1], i];
+                      }
+                    }
+                    else{ // its a red piece in the way
+                      aMoves[j] = false;
+                    }
+                  }
+                }
+                else // black's turn
+                {
+                  if(j == 0) // top left
+                  {
+                    // if adjacent piece is an enemy piece
+                    if(checkerPieceArray[i].team == 'red'){
+                      // check to see if any checker piece is behind it or not so that it can be jumped
+                      for(k = 0; k < checkerPieceArray.length; k++){
+                        if(pMoves[j][0] - 1 == checkerPieceArray[k].boardX && pMoves[j][1] - 1 == checkerPieceArray[k].boardY){
+                          aMoves[j] = false;
+                        }
+                        // make sure jump isn't off board
+                        if(pMoves[j][0] - 1 < 0 || pMoves[j][1] - 1 < 0){
+                          aMoves[j] = false;
+                        }
+                      }
+                      if(aMoves[j] != false){ // jump can be made
+                        pMoves[j][0] -= 1;
+                        pMoves[j][1] -= 1;
+                        // store jump moves board coords and piece being jumped over
+                        aJumpMoves[j] = [pMoves[j][0], pMoves[j][1], i];
+                        // i represents number of piece being jumped over
+                      }
+                    }
+                    else // the adjacent piece is black, therefore it can't be jumped
+                    {
+                      aMoves[j] = false;
+                    }
+                  }
+                  else if(j == 1)// top right
+                  {
+                    if(checkerPieceArray[i].team == "red"){
+                      // check to see if any checker piece is behind the one trying to be jumped
+                      for(k = 0; k < checkerPieceArray.length; k++){
+                        if(pMoves[j][0] + 1 == checkerPieceArray[k].boardX && pMoves[j][1] - 1 == checkerPieceArray[k].boardY){
+                          aMoves[j] = false;
+                        }
+                        // make sure jump isn't off board
+                        if(pMoves[j][0] + 1 > 7 || pMoves[j][1] - 1 < 0){
+                          aMoves[j] = false;
+                        }
+                      }
+                      if(aMoves[j] != false){ // jump can be made
+                        pMoves[j][0] += 1;
+                        pMoves[j][1] -= 1;
+                        // store jump moves board coords and piece being jumped over
+                        aJumpMoves[j] = [pMoves[j][0], pMoves[j][1], i];
+                        // i represents number of piece being jumped over
+                      }
+                    }
+                    else{ // its a black piece in the way
+                      aMoves[j] = false;
+                    }
+                  }
+                  else if(j == 2)// bottom left
+                  {
+                    if(checkerPieceArray[i].team == "red"){
+                      // check to see if any checker piece is behind the one trying to be jumped
+                      for(k = 0; k < checkerPieceArray.length; k++){
+                        if(pMoves[j][0] - 1 == checkerPieceArray[k].boardX && pMoves[j][1] + 1 == checkerPieceArray[k].boardY){
+                          aMoves[j] = false;
+                        }
+                        // make sure jump isn't off board
+                        if(pMoves[j][0] - 1 < 0 || pMoves[j][1] + 1 > 7){
+                          aMoves[j] = false;
+                        }
+
+                      }
+                      if(aMoves[j] != false){ // jump can be made
+                        pMoves[j][0] -= 1;
+                        pMoves[j][1] += 1;
+                        // store jump moves board coords and piece being jumped over
+                        aJumpMoves[j] = [pMoves[j][0], pMoves[j][1], i];
+                      }
+                    }
+                    else{ // its a black piece in the way
+                      aMoves[j] = false;
+                    }
+                  }
+                  else if(j == 3)// bottom right
+                  {
+                    if(checkerPieceArray[i].team == "red"){
+                      // check to see if any checker piece is behind the one trying to be jumped
+                      for(k = 0; k < checkerPieceArray.length; k++){
+                        if(pMoves[j][0] + 1 == checkerPieceArray[k].boardX && pMoves[j][1] + 1 == checkerPieceArray[k].boardY){
+                          aMoves[j] = false;
+                        }
+                        // make sure jump isn't off board
+                        if(pMoves[j][0] + 1 > 7 || pMoves[j][1] + 1 > 7){
+                          aMoves[j] = false;
+                        }
+                      }
+                      if(aMoves[j] != false){ // jump can be made
+                        pMoves[j][0] += 1;
+                        pMoves[j][1] += 1;
+                        // store jump moves board coords and piece being jumped over
+                        aJumpMoves[j] = [pMoves[j][0], pMoves[j][1], i];
+                      }
+                    }
+                    else{ // its a black piece in the way
+                      aMoves[j] = false;
+                    }
+                  }
+                }
+                //aMoves[j] = false;
               }
             }
           }                 
@@ -322,9 +530,9 @@
           }      
         }
         // debug to show the effects of evaluating 
-        /*for(k = 0; k < aMoves.length; k++){
-          window.alert(aMoves[k]);
-        }*/
+        for(k = 0; k < aMoves.length; k++){
+          //window.alert(aMoves[k]);
+        }
 
         return [aMoves, pMoves];
       };
@@ -523,7 +731,7 @@
      function initCheckerPieceArray(){
       checkerPieceArray = [];
       var nameString;
-      
+
       for(a = 0; a < 24; a++)
       {
 
@@ -661,13 +869,13 @@
           //pieceSelected[0] = true;
           redraw();
           drawAvailableMoves(pieceSelected[1]);
-
         }
       }
       // checker piece has already been selected
       else if(pieceSelected[0] == true)
       {
         //will run through the checkerPieceSelected function and not allow any other checker pieces to be clicked while the current chip is still selected.
+
         if(checkerPieceSelected(canvas_x,canvas_y) == true){
           // deselect current chip if clicked again
           redraw();
@@ -793,16 +1001,19 @@
           checkerPieceArray[n].setBoardY(intY);
           checkerPieceArray[n].setX(intX * (width/8));
           checkerPieceArray[n].setY(intY * (height/8));
+          //window.alert('in movepiece');
 
           // run through stored available jump moves if there are any
-          if(aJumpMoves[0][0] != undefined || aJumpMoves[1][0] != undefined){
+          if(aJumpMoves[0][0] != undefined || aJumpMoves[1][0] != undefined || aJumpMoves[2][0] != undefined || aJumpMoves[3][0] != undefined){
+           // window.alert();
             for(j = 0; j < aJumpMoves.length; j++){
+              //window.alert("running through available jump moves");
               // if move made by player is one of the jump moves, kill the piece that was jumped over
               if(intX == aJumpMoves[j][0] && intY == aJumpMoves[j][1]){
                 pieceToKill = [true, aJumpMoves[j][2]];
               }
             }
-            aJumpMoves = [[],[]];
+            aJumpMoves = [[],[],[],[]];
           }
 
           // change image of chip back to its unselected image
@@ -812,7 +1023,7 @@
           if(pieceToKill[0] == true){
             kill(pieceToKill[1]);
             pieceToKill = [false, null];
-            aJumpMoves = [[],[]];
+            aJumpMoves = [[],[],[],[]];
 
             // check to see if another jump is available
             if(redTurn == true){
@@ -833,7 +1044,7 @@
 
           // toggle turn switching
           toggleTurn();
-          aJumpMoves = [[],[]];
+          aJumpMoves = [[],[],[],[]];
           
           // update board to reflect changes
           redraw();
@@ -844,7 +1055,7 @@
      }
 
      function toggleTurn(){
-      if(aJumpMoves[0][0] != undefined || aJumpMoves[1][0] != undefined){
+      if(aJumpMoves[0][0] != undefined || aJumpMoves[1][0] != undefined || aJumpMoves[2][0] != undefined || aJumpMoves[3][0] != undefined){
         if(redTurn == true){
           //let red go again, there is another jump move available
         }else if(redTurn == false){
@@ -855,6 +1066,35 @@
         redTurn = false;
       }else if(redTurn == false){
         redTurn = true;
+      }
+      checkForWin();
+     }
+
+     // test for win/lose conditions
+     function checkForWin(){
+      var blackAlive = false;
+      var redAlive = false;
+      for(i = 0; i < checkerPieceArray.length; i++){
+        if(checkerPieceArray[i].team == 'black'){
+          blackAlive = true;
+        }
+        if(checkerPieceArray[i].team == 'red'){
+          redAlive = true;
+        }
+      }
+      if(redAlive == true && blackAlive == true){
+
+      }else{
+        if(redAlive == true && blackAlive == false){
+          window.alert("Red Wins!!!\n Close this dialog to restart the game.");
+          readyState = false;
+          main();
+        }
+        if(redAlive == false && blackAlive == true){
+          window.alert("Black Wins!!!\n Close this dialog to restart the game,");
+          readyState = false;
+          main();
+        }
       }
      }
 
